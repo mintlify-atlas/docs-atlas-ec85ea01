@@ -1,0 +1,79 @@
+{
+  "projectType": "saas",
+  "projectName": "FixTweetBot",
+  "projectDescription": "A Discord bot that automatically fixes social media embeds from 30+ platforms using online services.",
+  "theme": "palm",
+  "primaryColor": "#1d9bf0",
+  "lightColor": "#5ab9f5",
+  "darkColor": "#0c7abf",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": ["introduction", "quickstart", "installation"]
+          },
+          {
+            "group": "Usage",
+            "pages": ["usage/basic-usage", "usage/settings", "usage/filtering", "usage/custom-websites"]
+          },
+          {
+            "group": "Self-Hosting",
+            "pages": ["self-hosting/docker", "self-hosting/bare-metal", "self-hosting/configuration", "self-hosting/database"]
+          },
+          {
+            "group": "Features",
+            "pages": ["features/supported-platforms", "features/embed-views", "features/translations", "features/premium"]
+          },
+          {
+            "group": "Resources",
+            "pages": ["contributing", "faq", "troubleshooting", "changelog"]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Commands",
+            "pages": ["api/commands/settings", "api/commands/about"]
+          },
+          {
+            "group": "Configuration",
+            "pages": ["api/configuration/config-file", "api/configuration/environment-variables"]
+          },
+          {
+            "group": "Database",
+            "pages": ["api/database/models", "api/database/migrations"]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Supports 30+ social media platforms including Twitter, Instagram, TikTok, Reddit, Threads, Bluesky, Snapchat, and more",
+    "Automatic embed fixing with configurable behavior (remove embeds, delete message, or do nothing)",
+    "Advanced filtering by channel, role, member, or keyword with allow/deny lists",
+    "Custom website support for extending platform coverage",
+    "Multiple embed view modes (normal, direct media, gallery, text-only) per platform",
+    "Post translation capabilities",
+    "Multi-language support (English, French, Polish, Russian, Spanish, Vietnamese, Chinese, Portuguese, Japanese)",
+    "Premium features for enhanced functionality",
+    "Respects Discord markdown and spoilers",
+    "Bot and webhook message support",
+    "Silent reply options"
+  ],
+  "publicApiSurface": [
+    "/settings - Configure bot behavior for your server",
+    "/about - Get information about the bot and help",
+    "Environment Variables: DISCORD_TOKEN, DEV_GUILD, DATABASE_HOST, DATABASE_PORT, DATABASE_NAME, DATABASE_USER, DATABASE_PASSWORD, DATABASE_DRIVER",
+    "Configuration: override.config.yml for customizing bot settings",
+    "Website Classes: WebsiteLink base class for implementing custom website support",
+    "Database Models: Guild, TextChannel, Member, Role, CustomWebsite, Event",
+    "Guild Settings: original_message, reply_to_message, reply_silently, webhooks, keywords, twitter_view, instagram_view, tiktok_view, bluesky_view",
+    "Filter Settings: channels, members, roles (with allow/deny lists)",
+    "Keyword Filtering: Allow/deny list with regex matching"
+  ]
+}
