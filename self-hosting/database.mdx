@@ -1,0 +1,519 @@
+---
+title: Database Setup
+description: Database configuration, migrations, and maintenance for FixTweetBot
+---
+
+FixTweetBot uses a relational database to store guild settings, channel configurations, and user preferences. This guide covers database setup, migrations, and maintenance.
+
+## Supported Databases
+
+FixTweetBot supports multiple database systems through Masonite ORM:
+
+| Database | Driver | Recommended | Notes |
+|----------|--------|-------------|-------|
+| MariaDB | `mysql` | ✅ Yes | Best performance and compatibility |
+| MySQL | `mysql` | ✅ Yes | Fully supported |
+| PostgreSQL | `postgres` | ✅ Yes | Excellent alternative to MySQL/MariaDB |
+| Microsoft SQL Server | `mssql` | ⚠️ Advanced | Fully supported but less tested |
+| SQLite | `sqlite` | ❌ No | Testing only, not for production |
+
+<Note>
+  MariaDB 12.0 or higher is the recommended database for production deployments.
+</Note>
+
+## Database Setup
+
+### MariaDB / MySQL
+
+<Steps>
+  <Step title="Install MariaDB">
+    <CodeGroup>
+    ```bash Ubuntu/Debian
+    sudo apt update
+    sudo apt install mariadb-server
+    sudo systemctl start mariadb
+    sudo systemctl enable mariadb
+    ```
+
+    ```bash Fedora/RHEL
+    sudo dnf install mariadb-server
+    sudo systemctl start mariadb
+    sudo systemctl enable mariadb
+    ```
+
+    ```bash macOS
+    brew install mariadb
+    brew services start mariadb
+    ```
+    </CodeGroup>
+  </Step>
+
+  <Step title="Secure your installation">
+    ```bash
+    sudo mysql_secure_installation
+    ```
+
+    Follow the prompts to:
+    - Set a root password
+    - Remove anonymous users
+    - Disallow root login remotely
+    - Remove test database
+  </Step>
+
+  <Step title="Create database and user">
+    ```bash
+    sudo mysql -u root -p
+    ```
+
+    Then run:
+    ```sql
+    CREATE DATABASE fixtweetbot CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+    CREATE USER 'fixtweetbot'@'localhost' IDENTIFIED BY 'your_secure_password';
+    GRANT ALL PRIVILEGES ON fixtweetbot.* TO 'fixtweetbot'@'localhost';
+    FLUSH PRIVILEGES;
+    EXIT;
+    ```
+
+    <Warning>
+      Replace `your_secure_password` with a strong, unique password!
+    </Warning>
+  </Step>
+
+  <Step title="Configure the bot">
+    Update your `override.config.yml`:
+
+    ```yaml override.config.yml
+    database:
+      host: localhost
+      port: 3306
+      database: fixtweetbot
+      user: fixtweetbot
+      password: your_secure_password
+      driver: mysql
+    ```
+  </Step>
+</Steps>
+
+### PostgreSQL
+
+<Steps>
+  <Step title="Install PostgreSQL">
+    <CodeGroup>
+    ```bash Ubuntu/Debian
+    sudo apt update
+    sudo apt install postgresql postgresql-contrib
+    sudo systemctl start postgresql
+    sudo systemctl enable postgresql
+    ```
+
+    ```bash Fedora/RHEL
+    sudo dnf install postgresql-server postgresql-contrib
+    sudo postgresql-setup --initdb
+    sudo systemctl start postgresql
+    sudo systemctl enable postgresql
+    ```
+
+    ```bash macOS
+    brew install postgresql
+    brew services start postgresql
+    ```
+    </CodeGroup>
+  </Step>
+
+  <Step title="Create database and user">
+    ```bash
+    sudo -u postgres psql
+    ```
+
+    Then run:
+    ```sql
+    CREATE DATABASE fixtweetbot;
+    CREATE USER fixtweetbot WITH PASSWORD 'your_secure_password';
+    GRANT ALL PRIVILEGES ON DATABASE fixtweetbot TO fixtweetbot;
+    \q
+    ```
+  </Step>
+
+  <Step title="Install Python driver">
+    ```bash
+    pip install psycopg2-binary
+    ```
+  </Step>
+
+  <Step title="Configure the bot">
+    ```yaml override.config.yml
+    database:
+      host: localhost
+      port: 5432
+      database: fixtweetbot
+      user: fixtweetbot
+      password: your_secure_password
+      driver: postgres
+    ```
+  </Step>
+</Steps>
+
+### SQLite (Development Only)
+
+<Warning>
+  SQLite is not recommended for production use. Use it only for local development and testing.
+</Warning>
+
+```yaml override.config.yml
+database:
+  driver: sqlite
+  database: fixtweetbot.db
+```
+
+No additional setup is required. The database file will be created automatically.
+
+## Database Migrations
+
+FixTweetBot uses Masonite ORM for database migrations. Migrations are version-controlled schema changes that keep your database up to date.
+
+### Running Migrations
+
+<Tabs>
+  <Tab title="Docker">
+    Migrations run automatically when the container starts. The entrypoint script:
+
+    1. Waits for the database to be ready
+    2. Runs pending migrations
+    3. Starts the bot
+
+    To run migrations manually:
+    ```bash
+    docker compose exec bot masonite-orm migrate -C database/config.py -d database/migrations
+    ```
+  </Tab>
+
+  <Tab title="Bare Metal">
+    Run migrations manually before starting the bot:
+
+    ```bash
+    masonite-orm migrate -C database/config.py -d database/migrations
+    ```
+
+    This command:
+    - `-C database/config.py` - Specifies the database configuration file
+    - `-d database/migrations` - Points to the migrations directory
+  </Tab>
+</Tabs>
+
+### Migration Commands
+
+```bash
+# Run all pending migrations
+masonite-orm migrate -C database/config.py -d database/migrations
+
+# Rollback the last migration
+masonite-orm migrate:rollback -C database/config.py -d database/migrations
+
+# Check migration status
+masonite-orm migrate:status -C database/config.py -d database/migrations
+
+# Rollback all migrations
+masonite-orm migrate:reset -C database/config.py -d database/migrations
+
+# Rollback and re-run all migrations
+masonite-orm migrate:refresh -C database/config.py -d database/migrations
+```
+
+<Warning>
+  Be careful with `migrate:reset` and `migrate:refresh` as they will delete all data!
+</Warning>
+
+### Understanding Migrations
+
+Migrations are Python files that define schema changes. Here's an example:
+
+```python database/migrations/2023_11_17_092808_guilds_table.py
+from masoniteorm.migrations import Migration
+
+class GuildsTable(Migration):
+    def up(self):
+        """Run the migrations."""
+        with self.schema.create("guilds") as table:
+            table.big_integer("id").unsigned().unique()
+            table.timestamps()
+
+    def down(self):
+        """Revert the migrations."""
+        self.schema.drop("guilds")
+```
+
+- `up()` - Applies the migration (creates tables, adds columns, etc.)
+- `down()` - Reverts the migration (drops tables, removes columns, etc.)
+
+## Database Schema
+
+The bot uses multiple tables to store configuration:
+
+### Core Tables
+
+| Table | Purpose |
+|-------|----------|
+| `guilds` | Server configurations |
+| `text_channels` | Channel-specific settings |
+| `members` | User-specific preferences |
+| `roles` | Role-based configurations |
+| `custom_websites` | Custom website fix configurations |
+| `events` | Event tracking and analytics |
+| `migrations` | Migration history (managed by Masonite ORM) |
+
+### Relationships
+
+```
+guilds (1) ──┬─→ (many) text_channels
+             ├─→ (many) members
+             ├─→ (many) roles
+             └─→ (many) custom_websites
+```
+
+## Connection Pooling
+
+Connection pooling improves performance by reusing database connections.
+
+### Configuration
+
+```yaml override.config.yml
+database:
+  # Enable connection pooling
+  connection_pooling_enabled: true
+  
+  # Minimum number of connections in the pool
+  connection_pooling_min_size: 2
+  
+  # Maximum number of connections in the pool
+  connection_pooling_max_size: 10
+  
+  # Other database settings...
+  host: localhost
+  port: 3306
+  database: fixtweetbot
+  user: fixtweetbot
+  password: your_password
+  driver: mysql
+```
+
+### Recommended Pool Sizes
+
+| Bot Size | Min Size | Max Size |
+|----------|----------|----------|
+| Small (under 100 servers) | 2 | 5 |
+| Medium (100-1000 servers) | 5 | 10 |
+| Large (over 1000 servers) | 10 | 20 |
+
+## Database Maintenance
+
+### Backup
+
+<Tabs>
+  <Tab title="MariaDB/MySQL">
+    ```bash
+    # Create backup
+    mysqldump -u fixtweetbot -p fixtweetbot > backup_$(date +%Y%m%d).sql
+
+    # Restore from backup
+    mysql -u fixtweetbot -p fixtweetbot < backup_20260303.sql
+    ```
+
+    For Docker:
+    ```bash
+    # Create backup
+    docker compose exec db mysqldump -u fixtweetbot -p fixtweetbot > backup.sql
+
+    # Restore from backup
+    docker compose exec -T db mysql -u fixtweetbot -p fixtweetbot < backup.sql
+    ```
+  </Tab>
+
+  <Tab title="PostgreSQL">
+    ```bash
+    # Create backup
+    pg_dump -U fixtweetbot fixtweetbot > backup_$(date +%Y%m%d).sql
+
+    # Restore from backup
+    psql -U fixtweetbot fixtweetbot < backup_20260303.sql
+    ```
+
+    For Docker:
+    ```bash
+    # Create backup
+    docker compose exec db pg_dump -U fixtweetbot fixtweetbot > backup.sql
+
+    # Restore from backup
+    docker compose exec -T db psql -U fixtweetbot fixtweetbot < backup.sql
+    ```
+  </Tab>
+
+  <Tab title="SQLite">
+    ```bash
+    # Create backup (simple file copy)
+    cp fixtweetbot.db fixtweetbot_backup_$(date +%Y%m%d).db
+
+    # Restore from backup
+    cp fixtweetbot_backup_20260303.db fixtweetbot.db
+    ```
+  </Tab>
+</Tabs>
+
+### Automated Backups
+
+Create a cron job for daily backups:
+
+```bash
+# Edit crontab
+crontab -e
+
+# Add daily backup at 2 AM
+0 2 * * * mysqldump -u fixtweetbot -p'your_password' fixtweetbot > /backups/fixtweetbot_$(date +\%Y\%m\%d).sql
+```
+
+### Optimize Tables
+
+<CodeGroup>
+```sql MariaDB/MySQL
+-- Optimize all tables
+USE fixtweetbot;
+OPTIMIZE TABLE guilds, text_channels, members, roles, custom_websites, events;
+```
+
+```sql PostgreSQL
+-- Vacuum and analyze
+VACUUM ANALYZE;
+```
+</CodeGroup>
+
+## Troubleshooting
+
+### Migration Failures
+
+If a migration fails:
+
+1. Check the error message for details
+2. Verify database connection settings
+3. Ensure the database user has sufficient permissions
+4. Check migration status:
+   ```bash
+   masonite-orm migrate:status -C database/config.py -d database/migrations
+   ```
+
+### Connection Errors
+
+<Steps>
+  <Step title="Verify database is running">
+    <CodeGroup>
+    ```bash MariaDB/MySQL
+    sudo systemctl status mariadb
+    # or
+    sudo systemctl status mysql
+    ```
+
+    ```bash PostgreSQL
+    sudo systemctl status postgresql
+    ```
+    </CodeGroup>
+  </Step>
+
+  <Step title="Test connection manually">
+    <CodeGroup>
+    ```bash MariaDB/MySQL
+    mysql -u fixtweetbot -p -h localhost fixtweetbot
+    ```
+
+    ```bash PostgreSQL
+    psql -U fixtweetbot -h localhost fixtweetbot
+    ```
+    </CodeGroup>
+  </Step>
+
+  <Step title="Check firewall rules">
+    Ensure the database port is accessible:
+    ```bash
+    # For MySQL/MariaDB (port 3306)
+    sudo netstat -tulpn | grep 3306
+
+    # For PostgreSQL (port 5432)
+    sudo netstat -tulpn | grep 5432
+    ```
+  </Step>
+
+  <Step title="Verify credentials">
+    Double-check your `override.config.yml` settings match the database user and password.
+  </Step>
+</Steps>
+
+### Docker Database Not Ready
+
+If the bot starts before the database is ready:
+
+1. The entrypoint script includes a wait mechanism
+2. Check database health:
+   ```bash
+   docker compose ps
+   ```
+3. View database logs:
+   ```bash
+   docker compose logs db
+   ```
+
+### Permission Errors
+
+If you get permission denied errors:
+
+```sql
+-- Grant all necessary permissions
+GRANT ALL PRIVILEGES ON fixtweetbot.* TO 'fixtweetbot'@'localhost';
+FLUSH PRIVILEGES;
+```
+
+## Performance Tuning
+
+### MariaDB/MySQL Optimization
+
+Edit `/etc/mysql/mariadb.conf.d/50-server.cnf` (or equivalent):
+
+```ini
+[mysqld]
+# Increase buffer pool size (50-80% of available RAM)
+innodb_buffer_pool_size = 1G
+
+# Increase max connections
+max_connections = 200
+
+# Enable query cache
+query_cache_type = 1
+query_cache_size = 64M
+```
+
+Restart MariaDB:
+```bash
+sudo systemctl restart mariadb
+```
+
+### PostgreSQL Optimization
+
+Edit `/var/lib/pgsql/data/postgresql.conf` (or equivalent):
+
+```ini
+# Increase shared buffers (25% of RAM)
+shared_buffers = 1GB
+
+# Increase work memory
+work_mem = 16MB
+
+# Increase max connections
+max_connections = 200
+```
+
+Restart PostgreSQL:
+```bash
+sudo systemctl restart postgresql
+```
+
+## Next Steps
+
+- [Docker deployment](/self-hosting/docker) - Run with Docker
+- [Bare metal installation](/self-hosting/bare-metal) - Manual installation
+- [Configuration reference](/self-hosting/configuration) - Customize bot settings

@@ -1,0 +1,335 @@
+---
+title: Docker Deployment
+description: Deploy FixTweetBot using Docker and Docker Compose
+---
+
+Docker is the recommended way to deploy FixTweetBot. This guide will walk you through setting up the bot using Docker Compose with MariaDB.
+
+## Prerequisites
+
+Before you begin, ensure you have:
+
+- Docker and Docker Compose installed
+- A Discord bot token (see [Setup](/installation))
+- Basic familiarity with command line tools
+
+## Quick Start
+
+<Steps>
+  <Step title="Create a directory for your bot">
+    Create a new directory to store your configuration files:
+
+    ```bash
+    mkdir fixtweetbot
+    cd fixtweetbot
+    ```
+  </Step>
+
+  <Step title="Download the docker-compose file">
+    Download the example docker-compose.yml file:
+
+    ```bash
+    curl -o docker-compose.yml https://raw.githubusercontent.com/Kyrela/FixTweetBot/main/docker-compose.example.yml
+    ```
+
+    Or create a `docker-compose.yml` file with the following content:
+
+    ```yaml docker-compose.yml
+    services:
+      bot:
+        image: kyrela/fixtweetbot:latest
+        restart: unless-stopped
+        depends_on:
+          - db
+        environment:
+          # Should be equal to the name of the database container.
+          - DATABASE_HOST=db
+          - DATABASE_PORT=3306
+          # Should be equal to MYSQL_DATABASE.
+          - DATABASE_NAME=fixtweetbot
+          # Should be equal to MYSQL_USER.
+          - DATABASE_USER=fixtweetbot
+          # Should be equal to MYSQL_PASSWORD.
+          - DATABASE_PASSWORD=changeme123
+          # Your Discord bot token.
+          - DISCORD_TOKEN=your_discord_bot_token
+          # Optional: Server ID that you want to use for controlling your bot's instance.
+          # - DEV_GUILD=your_discord_dev_guild_id
+        # uncomment and create file if you want to override any default settings
+        # volumes:
+        #    - ./override.config.yml:/usr/local/app/override.config.yml:ro
+
+      db:
+        image: mariadb:12.0
+        restart: unless-stopped
+        environment:
+          - MYSQL_DATABASE=fixtweetbot
+          - MYSQL_USER=fixtweetbot
+          # Generate a random password for this field.
+          - MYSQL_PASSWORD=changeme123
+          # Generate a random password for this field. Do not use the same password!
+          - MYSQL_ROOT_PASSWORD=changeme234
+        volumes:
+          - mysql_data:/var/lib/mysql
+        healthcheck:
+          test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+          interval: 30s
+          timeout: 5s
+          retries: 5
+          start_period: 30s
+        ports:
+          - "3306:3306"
+
+    volumes:
+      mysql_data:
+        driver: local
+    ```
+  </Step>
+
+  <Step title="Configure your environment">
+    Edit the `docker-compose.yml` file and update the following values:
+
+    - **DISCORD_TOKEN**: Your Discord bot token
+    - **MYSQL_PASSWORD**: Generate a strong random password
+    - **MYSQL_ROOT_PASSWORD**: Generate a different strong random password
+    - **DATABASE_PASSWORD**: Should match MYSQL_PASSWORD
+
+    <Warning>
+      Never use the default passwords `changeme123` or `changeme234` in production!
+    </Warning>
+
+    Optionally, you can also set:
+    - **DEV_GUILD**: Your server ID for development/admin commands
+  </Step>
+
+  <Step title="Start the bot">
+    Launch the bot using Docker Compose:
+
+    ```bash
+    docker compose up -d
+    ```
+
+    The bot will:
+    1. Pull the required Docker images
+    2. Start the MariaDB database
+    3. Wait for the database to be ready
+    4. Automatically run database migrations
+    5. Start the bot
+  </Step>
+
+  <Step title="Verify the bot is running">
+    Check the logs to ensure everything started correctly:
+
+    ```bash
+    docker compose logs -f bot
+    ```
+
+    You should see the bot connecting to Discord and becoming ready.
+  </Step>
+</Steps>
+
+## Environment Variables
+
+The Docker deployment uses environment variables for configuration. Here's a complete reference:
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `UID` | No | `1000` | User ID used inside the container |
+| `GID` | No | `1000` | Group ID used inside the container |
+| `DATABASE_HOST` | Yes | - | Database hostname (use `db` for docker-compose) |
+| `DATABASE_PORT` | Yes | - | Database port (typically `3306` for MySQL/MariaDB) |
+| `DATABASE_NAME` | Yes | - | Database name |
+| `DATABASE_USER` | Yes | - | Database username |
+| `DATABASE_PASSWORD` | Yes | - | Database password |
+| `DATABASE_DRIVER` | No | `mysql` | Database driver (`mysql`, `postgres`, `sqlite`, `mssql`) |
+| `DISCORD_TOKEN` | Yes | - | Your Discord bot token |
+| `DEV_GUILD` | No | - | Server ID for development/admin commands |
+
+## Advanced Configuration
+
+### Using an Override Config File
+
+For advanced customization, you can create an `override.config.yml` file to override default settings from `config.yml`.
+
+<Steps>
+  <Step title="Create override.config.yml">
+    Create a file named `override.config.yml` in your bot directory:
+
+    ```yaml override.config.yml
+    # Example: Change bot description
+    description: "My custom FixTweetBot instance"
+    
+    # Example: Disable analytics
+    analytic: false
+    
+    # Example: Customize logging
+    log:
+      file: "custom-log.txt"
+      alert_user: true
+    ```
+
+    See the [Configuration reference](/self-hosting/configuration) for all available options.
+  </Step>
+
+  <Step title="Mount the override file">
+    Uncomment the volumes section in your `docker-compose.yml`:
+
+    ```yaml
+    services:
+      bot:
+        # ... other configuration ...
+        volumes:
+          - ./override.config.yml:/usr/local/app/override.config.yml:ro
+    ```
+  </Step>
+
+  <Step title="Restart the bot">
+    ```bash
+    docker compose restart bot
+    ```
+  </Step>
+</Steps>
+
+### Using a Different Database
+
+While MariaDB is recommended, you can use other database systems:
+
+<CodeGroup>
+```yaml PostgreSQL
+services:
+  bot:
+    environment:
+      - DATABASE_DRIVER=postgres
+      - DATABASE_HOST=db
+      - DATABASE_PORT=5432
+      # ... other settings ...
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_DB=fixtweetbot
+      - POSTGRES_USER=fixtweetbot
+      - POSTGRES_PASSWORD=your_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+```
+
+```yaml SQLite
+services:
+  bot:
+    environment:
+      - DATABASE_DRIVER=sqlite
+      - DATABASE_NAME=/data/fixtweetbot.db
+    volumes:
+      - ./data:/data
+
+# Remove the db service when using SQLite
+```
+</CodeGroup>
+
+## Maintenance
+
+### Updating the Bot
+
+<Steps>
+  <Step title="Pull the latest image">
+    ```bash
+    docker compose pull bot
+    ```
+  </Step>
+
+  <Step title="Restart with the new image">
+    ```bash
+    docker compose up -d bot
+    ```
+  </Step>
+
+  <Step title="Check logs">
+    ```bash
+    docker compose logs -f bot
+    ```
+  </Step>
+</Steps>
+
+### Viewing Logs
+
+```bash
+# View all logs
+docker compose logs
+
+# Follow bot logs in real-time
+docker compose logs -f bot
+
+# Follow database logs
+docker compose logs -f db
+
+# View last 100 lines
+docker compose logs --tail=100 bot
+```
+
+### Backing Up the Database
+
+```bash
+# Create a backup
+docker compose exec db mysqldump -u fixtweetbot -p fixtweetbot > backup.sql
+
+# Restore from backup
+docker compose exec -T db mysql -u fixtweetbot -p fixtweetbot < backup.sql
+```
+
+### Stopping the Bot
+
+```bash
+# Stop all services
+docker compose down
+
+# Stop and remove volumes (WARNING: This deletes all data!)
+docker compose down -v
+```
+
+## Troubleshooting
+
+### Bot won't start
+
+1. Check if the database is ready:
+   ```bash
+   docker compose logs db
+   ```
+
+2. Verify your Discord token is correct
+
+3. Check bot logs for errors:
+   ```bash
+   docker compose logs bot
+   ```
+
+### Database connection errors
+
+1. Ensure `DATABASE_HOST` matches your database service name (`db` in docker-compose)
+2. Verify passwords match between bot and database configuration
+3. Check if the database container is healthy:
+   ```bash
+   docker compose ps
+   ```
+
+### Permission errors
+
+If you encounter permission issues, you can set the UID and GID:
+
+```yaml
+services:
+  bot:
+    environment:
+      - UID=1001
+      - GID=1001
+      # ... other settings ...
+```
+
+## Next Steps
+
+- [Configure your bot](/self-hosting/configuration) - Customize bot behavior
+- [Database setup](/self-hosting/database) - Learn about database management
+- [Bot permissions](/setup/permissions) - Set up required Discord permissions

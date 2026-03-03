@@ -1,80 +1,185 @@
 ---
-title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+title: Quickstart
+description: Add FixTweetBot to your Discord server and send your first fixed link in under 2 minutes
 ---
 
-## Get started in three steps
+# Quickstart guide
 
-Get your documentation site running locally and make your first customization.
+Get FixTweetBot up and running in your Discord server in just a few steps.
 
-### Step 1: Set up your local environment
-
-<AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
+<Steps>
+  <Step title="Invite the bot to your server">
+    Click the invite link to add FixTweetBot to your Discord server:
     
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
-  </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
+    [Invite FixTweetBot](https://discord.com/oauth2/authorize?client_id=1164651057243238400)
     
-    <Tip>Your preview updates automatically as you edit files.</Tip>
-  </Accordion>
-</AccordionGroup>
-
-### Step 2: Deploy your changes
-
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
+    <Note>
+    You need **Manage Server** permission to add bots to a Discord server.
+    </Note>
     
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
+    Select the server from the dropdown and authorize the bot with the requested permissions:
+    
+    - View Channels
+    - Send Messages
+    - Send Messages in Threads
+    - Embed Links
+    - Read Message History
+    - Manage Messages (to suppress/delete original embeds)
+    
+    <Warning>
+    The bot requires **Manage Messages** permission to remove or suppress embeds from your original messages. Without this, the bot will still post fixed links but can't clean up the original.
+    </Warning>
+  </Step>
 
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
+  <Step title="Send a social media link">
+    Post a message containing a link from any supported platform. For example:
+    
+    ```
+    Check out this tweet: https://twitter.com/user/status/1234567890
+    ```
+    
+    Or try Instagram, TikTok, Reddit, or any of the 30+ supported platforms:
+    
+    ```
+    https://www.instagram.com/p/ABC123/
+    https://www.tiktok.com/@user/video/1234567890
+    https://www.reddit.com/r/example/comments/abc123/
+    ```
+    
+    <Info>
+    The bot automatically detects links in regular messages. You don't need to use any special commands or syntax.
+    </Info>
+  </Step>
 
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
+  <Step title="Bot posts the fixed link">
+    FixTweetBot will:
+    
+    1. Detect the social media link in your message
+    2. Reply with a fixed version that has better embeds
+    3. Suppress or delete the original embed (if configured and bot has permissions)
+    
+    The fixed message includes:
+    - A link to the fixed embed (better video playback, galleries, etc.)
+    - A link to the original post
+    - A link to the author's profile (when available)
+    
+    Example output:
+    ```
+    [Tweet](https://twitter.com/user/status/1234567890) • [@user](https://twitter.com/user) • [FxTwitter](https://fxtwitter.com/user/status/1234567890)
+    ```
+  </Step>
 
-### Step 3: Go live
-
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
+  <Step title="Customize settings (optional)">
+    Use the `/settings` command to customize how the bot behaves:
+    
+    ```
+    /settings
+    ```
+    
+    This opens an interactive menu where you can:
+    
+    - Enable/disable specific platforms
+    - Choose embed view styles (normal, direct media, gallery, text-only)
+    - Set whether to keep, suppress, or delete original messages
+    - Configure silent replies
+    - Set up filters by channel, role, or member
+    - Add keyword filters
+    - Enable post translation
+    - Add custom websites
+    
+    <Tip>
+    The `/settings` command requires **Manage Messages** permission in your server.
+    </Tip>
+  </Step>
+</Steps>
 
 ## Next steps
 
-Now that you have your docs running, explore these key features:
+Now that FixTweetBot is working in your server, explore these features:
 
 <CardGroup cols={2}>
-
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
-
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
-
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
-
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
-
+  <Card
+    title="Configure embed views"
+    icon="eye"
+    href="/features/embed-views"
+  >
+    Choose how embeds appear for each platform
+  </Card>
+  <Card
+    title="Set up filters"
+    icon="filter"
+    href="/usage/filtering"
+  >
+    Control where and when the bot responds
+  </Card>
+  <Card
+    title="Enable translation"
+    icon="language"
+    href="/features/translations"
+  >
+    Automatically translate posts to your language
+  </Card>
+  <Card
+    title="Add custom websites"
+    icon="plus"
+    href="/usage/custom-websites"
+  >
+    Fix embeds from your own custom domains
+  </Card>
 </CardGroup>
 
-<Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
-</Note>
+## Ignoring specific links
+
+If you want the bot to skip a particular link, add `fxignore` anywhere in your message:
+
+```
+Check this out https://twitter.com/user/status/123 fxignore
+```
+
+The bot will ignore all links in that message and leave the normal embed.
+
+## Common issues
+
+<AccordionGroup>
+  <Accordion title="Bot doesn't respond to my links">
+    Check that:
+    1. The bot has permission to view the channel (View Channels)
+    2. The bot has permission to send messages (Send Messages, Embed Links)
+    3. The platform is enabled in `/settings` > Websites
+    4. The channel isn't filtered out in `/settings` > Filters
+    5. Your message doesn't contain `fxignore`
+  </Accordion>
+  
+  <Accordion title="Original embed doesn't get removed">
+    The bot needs **Manage Messages** permission to suppress or delete the original embed. Check the bot's role permissions in Server Settings > Roles.
+  </Accordion>
+  
+  <Accordion title="Fixed link has no embed">
+    This can happen if:
+    - The fixer service is temporarily down
+    - The original post was deleted or made private
+    - The content exceeds Discord's embed size limits
+    
+    The bot will automatically delete failed fixed messages after a few seconds.
+  </Accordion>
+  
+  <Accordion title="Want to respond to other bots or webhooks?">
+    This is a premium feature. Check out the [premium subscription](https://discord.com/application-directory/1164651057243238400/store/1260699263755751456) or use the `/about` command to learn more.
+  </Accordion>
+</AccordionGroup>
+
+## Getting help
+
+Need assistance? Here are your options:
+
+- Use `/about` in Discord to see bot information and links
+- Join the [support server](https://discord.gg/3ej9JrkF3U)
+- Report issues on [GitHub](https://github.com/Kyrela/FixTweetBot/issues)
+
+<Card
+  title="Explore all features"
+  icon="compass"
+  href="/features/supported-platforms"
+>
+  Learn about everything FixTweetBot can do
+</Card>

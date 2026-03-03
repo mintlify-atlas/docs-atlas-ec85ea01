@@ -1,0 +1,359 @@
+---
+title: Troubleshooting
+description: Common issues and solutions for FixTweetBot
+---
+
+Encountering issues with FixTweetBot? This guide covers common problems and their solutions.
+
+## Bot Not Responding
+
+### The bot doesn't fix any links
+
+<AccordionGroup>
+  <Accordion title="Check bot permissions">
+    The bot needs specific permissions to function:
+    
+    **Required Permissions:**
+    - View Channels
+    - Send Messages
+    - Send Messages in Threads
+    - Embed Links
+    - Read Message History
+    - Manage Messages
+    
+    **How to check:**
+    1. Right-click the bot in your member list
+    2. Select **Permissions**
+    3. Verify all required permissions are enabled
+    
+    <Tip>
+      If permissions are missing, adjust the bot's role permissions or check channel-specific permission overrides.
+    </Tip>
+  </Accordion>
+
+  <Accordion title="Verify the bot is online">
+    Check if the bot shows as online in your server's member list. If it appears offline:
+    
+    - Check the [support server](https://discord.gg/3ej9JrkF3U) for announcements
+    - Look for status updates on [GitHub](https://github.com/Kyrela/FixTweetBot)
+    - The bot may be experiencing temporary downtime
+  </Accordion>
+
+  <Accordion title="Check channel permissions">
+    Even if the bot has server-wide permissions, channel-specific overrides may block it:
+    
+    1. Go to your channel settings
+    2. Navigate to **Permissions**
+    3. Check the bot's role or the bot user specifically
+    4. Ensure no permissions are denied (red X)
+  </Accordion>
+
+  <Accordion title="Review bot settings">
+    The bot might be disabled for specific channels, roles, or members:
+    
+    1. Use `/settings` to open the configuration panel
+    2. Check the **Filters** section
+    3. Verify the channel/role/member isn't in the ignore list
+    4. Check that the platform isn't disabled
+  </Accordion>
+</AccordionGroup>
+
+## Embed Issues
+
+### Original embed isn't removed
+
+<AccordionGroup>
+  <Accordion title="Check Manage Messages permission">
+    The bot needs the **Manage Messages** permission to remove embeds:
+    
+    1. Verify the bot has this permission server-wide
+    2. Check for channel-specific permission overrides
+    3. Ensure no role conflicts are denying this permission
+  </Accordion>
+
+  <Accordion title="Review embed removal settings">
+    You can configure what happens to the original message:
+    
+    1. Use `/settings`
+    2. Navigate to behavior settings
+    3. Choose your preferred option:
+       - Do nothing (keeps original embed)
+       - Remove embed only
+       - Delete the entire message
+  </Accordion>
+
+  <Accordion title="Discord embed suppression delay">
+    Discord may take a moment to remove embeds. If the embed persists:
+    
+    - Wait a few seconds
+    - Refresh Discord (Ctrl+R)
+    - Check if the bot has Manage Messages permission
+  </Accordion>
+</AccordionGroup>
+
+### Fixed embed doesn't appear
+
+<AccordionGroup>
+  <Accordion title="Check Embed Links permission">
+    The bot needs **Embed Links** permission to post embeds:
+    
+    1. Verify the bot's role has this permission
+    2. Check channel-specific overrides
+    3. Ensure the permission isn't denied
+  </Accordion>
+
+  <Accordion title="Verify link format">
+    Make sure your link is in a supported format:
+    
+    - Full URLs (https://twitter.com/...)
+    - Not wrapped in code blocks
+    - Not using unsupported shorteners
+    - Platform is supported (check [supported platforms](/features/supported-platforms))
+  </Accordion>
+
+  <Accordion title="Check fixing service status">
+    The bot relies on external fixing services. If a service is down:
+    
+    - The bot will still attempt to post the link
+    - The embed may not appear or be incomplete
+    - Check the [Credits section](https://github.com/Kyrela/FixTweetBot#fixers) for service status
+  </Accordion>
+</AccordionGroup>
+
+## Link Detection
+
+### Bot only fixes some links
+
+<AccordionGroup>
+  <Accordion title="Check platform settings">
+    Individual platforms can be enabled/disabled:
+    
+    1. Use `/settings`
+    2. Review enabled platforms
+    3. Make sure the platform you're trying to use is enabled
+  </Accordion>
+
+  <Accordion title="Verify link format">
+    Some link formats may not be recognized:
+    
+    **Supported formats:**
+    - Standard URLs: `https://twitter.com/user/status/123`
+    - Mobile links: `https://mobile.twitter.com/...`
+    - Platform-specific formats (see [supported platforms](/features/supported-platforms))
+    
+    **Not supported:**
+    - Shortened URLs without expansion
+    - Links in code blocks: `` `https://...` ``
+    - Malformed URLs
+  </Accordion>
+
+  <Accordion title="fxignore keyword">
+    If your message contains `fxignore`, the bot will skip it:
+    
+    - Check your message for this keyword
+    - Check server-wide keyword filters in `/settings`
+    - Verify no custom ignore keywords are matching
+  </Accordion>
+</AccordionGroup>
+
+### Bot doesn't respond to bot messages
+
+<AccordionGroup>
+  <Accordion title="Bot/webhook responses are premium">
+    Responding to messages from other bots and webhooks is a premium feature:
+    
+    <Info>
+      Purchase the [premium subscription](https://discord.com/application-directory/1164651057243238400/store/1260699263755751456) to enable this feature.
+    </Info>
+  </Accordion>
+
+  <Accordion title="Enable in premium settings">
+    If you have premium:
+    
+    1. Use `/settings`
+    2. Navigate to premium features
+    3. Enable bot/webhook responses
+  </Accordion>
+</AccordionGroup>
+
+## Configuration Issues
+
+### Settings command doesn't work
+
+<AccordionGroup>
+  <Accordion title="Check permissions">
+    You need proper server permissions to use `/settings`:
+    
+    - Server admin or manage server permission
+    - Or a role configured to manage the bot
+  </Accordion>
+
+  <Accordion title="Refresh slash commands">
+    If `/settings` doesn't appear:
+    
+    1. Wait a few minutes (commands can take time to register)
+    2. Try in a different channel
+    3. Restart your Discord client
+    4. Re-invite the bot to refresh permissions
+  </Accordion>
+</AccordionGroup>
+
+### Custom websites not working
+
+<AccordionGroup>
+  <Accordion title="Verify custom website configuration">
+    Custom websites require specific configuration:
+    
+    1. Use `/settings` and navigate to custom websites
+    2. Ensure the domain pattern is correct
+    3. Verify the replacement URL format
+    4. Test with a simple example first
+    
+    See the [custom websites guide](/usage/custom-websites) for detailed instructions.
+  </Accordion>
+
+  <Accordion title="Check URL format">
+    Custom website patterns must:
+    
+    - Use valid regex or glob patterns
+    - Match the exact URL structure
+    - Include proper protocol (http/https)
+  </Accordion>
+</AccordionGroup>
+
+## Performance Issues
+
+### Bot is slow to respond
+
+<AccordionGroup>
+  <Accordion title="High server load">
+    During peak times, the bot may respond more slowly:
+    
+    - This is normal and temporary
+    - Check the [support server](https://discord.gg/3ej9JrkF3U) for status updates
+    - Premium users may get priority processing
+  </Accordion>
+
+  <Accordion title="External service delays">
+    Fixing services may experience delays:
+    
+    - The bot must wait for the fixing service to respond
+    - Service outages can cause delays
+    - Some platforms are slower than others
+  </Accordion>
+</AccordionGroup>
+
+### Rate limiting
+
+<AccordionGroup>
+  <Accordion title="Discord rate limits">
+    Discord has rate limits for bot actions:
+    
+    - The bot automatically handles rate limits
+    - Messages may be delayed during high activity
+    - This is a Discord limitation, not a bot issue
+  </Accordion>
+
+  <Accordion title="Fixing service rate limits">
+    Some fixing services have rate limits:
+    
+    - Links may fail to fix during heavy usage
+    - This is usually temporary
+    - Self-hosting can help avoid shared rate limits
+  </Accordion>
+</AccordionGroup>
+
+## Self-Hosting Issues
+
+### Bot won't start
+
+<AccordionGroup>
+  <Accordion title="Check configuration file">
+    Verify your `override.config.yml` is properly formatted:
+    
+    - Token is set correctly
+    - Database credentials are valid
+    - No YAML syntax errors
+    
+    See the [configuration guide](/self-hosting/configuration) for details.
+  </Accordion>
+
+  <Accordion title="Database connection issues">
+    Common database problems:
+    
+    - Database server not running
+    - Incorrect credentials
+    - Database not initialized (run migrations)
+    - Firewall blocking connection
+    
+    Check the [database setup guide](/self-hosting/database).
+  </Accordion>
+
+  <Accordion title="Check logs">
+    Review the bot's log file for error messages:
+    
+    ```bash
+    # For Docker
+    docker compose logs -f
+    
+    # For bare metal
+    cat log.txt
+    ```
+  </Accordion>
+</AccordionGroup>
+
+### Docker issues
+
+<AccordionGroup>
+  <Accordion title="Container won't start">
+    Check Docker logs and configuration:
+    
+    ```bash
+    docker compose logs
+    ```
+    
+    Common issues:
+    - Missing environment variables
+    - Port conflicts
+    - Volume mount errors
+    - Database not ready
+    
+    See the [Docker setup guide](/self-hosting/docker).
+  </Accordion>
+
+  <Accordion title="Permission errors">
+    UID/GID mismatches can cause issues:
+    
+    - Check the `UID` and `GID` environment variables
+    - Ensure they match your file ownership
+    - Default is 1000:1000
+  </Accordion>
+</AccordionGroup>
+
+## Still Need Help?
+
+If you're still experiencing issues:
+
+<CardGroup cols={2}>
+  <Card title="Support Server" icon="discord" href="https://discord.gg/3ej9JrkF3U">
+    Join the support server for live help
+  </Card>
+  <Card title="GitHub Issues" icon="github" href="https://github.com/Kyrela/FixTweetBot/issues">
+    Report bugs or request features
+  </Card>
+  <Card title="Use /about Command" icon="circle-info">
+    Get quick help and information in Discord
+  </Card>
+  <Card title="Check Status" icon="signal" href="https://github.com/Kyrela/FixTweetBot">
+    View the repository for updates
+  </Card>
+</CardGroup>
+
+<Tip>
+  When asking for help, include:
+  - What you were trying to do
+  - What happened instead
+  - Any error messages
+  - Your bot version (use `/about`)
+  - Whether you're self-hosting
+</Tip>

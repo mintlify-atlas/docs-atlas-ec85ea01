@@ -1,0 +1,249 @@
+---
+title: 'Environment Variables'
+description: 'All environment variables for configuring FixTweetBot'
+---
+
+Environment variables are the recommended way to configure FixTweetBot when running in Docker. They can also be used for bare metal installations alongside the configuration files.
+
+## Environment Variables Reference
+
+### Docker Runtime Variables
+
+<ParamField path="UID" type="integer" default="1000">
+  User ID used inside the Docker container. This should match the file ownership on your host system.
+</ParamField>
+
+<ParamField path="GID" type="integer" default="1000">
+  Group ID used inside the Docker container. This should match the file ownership on your host system.
+</ParamField>
+
+### Database Configuration
+
+<ParamField path="DATABASE_HOST" type="string" required>
+  Database server hostname or IP address.
+  
+  **Example:** `db` (Docker service name) or `localhost` (bare metal)
+</ParamField>
+
+<ParamField path="DATABASE_PORT" type="integer" required>
+  Database server port number.
+  
+  **Default ports by database type:**
+  - MySQL/MariaDB: `3306`
+  - PostgreSQL: `5432`
+  - Microsoft SQL Server: `1433`
+</ParamField>
+
+<ParamField path="DATABASE_NAME" type="string" required>
+  Name of the database to connect to.
+  
+  **Example:** `fixtweetbot`
+</ParamField>
+
+<ParamField path="DATABASE_USER" type="string" required>
+  Database username for authentication.
+  
+  **Example:** `fixtweetbot`
+</ParamField>
+
+<ParamField path="DATABASE_PASSWORD" type="string" required>
+  Database password for authentication.
+  
+  <Warning>
+  Always use strong, randomly generated passwords. Never commit passwords to version control.
+  </Warning>
+</ParamField>
+
+<ParamField path="DATABASE_DRIVER" type="string" default="mysql">
+  Database driver to use. Determines which database system the bot connects to.
+  
+  **Supported values:**
+  - `mysql` - MySQL or MariaDB (recommended)
+  - `postgres` - PostgreSQL
+  - `mssql` - Microsoft SQL Server
+  - `sqlite` - SQLite (not recommended for production)
+</ParamField>
+
+### Bot Configuration
+
+<ParamField path="DISCORD_TOKEN" type="string" required>
+  Your Discord bot token from the [Discord Developer Portal](https://discord.com/developers/applications).
+  
+  <Warning>
+  Keep your bot token secret! Never share it publicly or commit it to version control.
+  </Warning>
+</ParamField>
+
+<ParamField path="DEV_GUILD" type="string">
+  Discord server (guild) ID for development and testing commands. When set, certain commands will only be registered in this server for faster updates during development.
+  
+  **Example:** `1234567890123456789`
+</ParamField>
+
+### Python Runtime Variables
+
+These are set automatically in the Docker container but can be customized if needed:
+
+<ParamField path="DISCORE_CONFIG" type="string" default="/usr/local/app/docker.config.yml">
+  Path to the discore configuration file. Only relevant when using Docker.
+</ParamField>
+
+<ParamField path="PYTHONUNBUFFERED" type="integer" default="1">
+  When set to `1`, Python output is sent directly to terminal without buffering. This ensures logs appear immediately.
+</ParamField>
+
+<ParamField path="PYTHONDONTWRITEBYTECODE" type="integer" default="1">
+  When set to `1`, Python won't write `.pyc` bytecode files. This reduces clutter in the container.
+</ParamField>
+
+<ParamField path="PATH" type="string" default="/usr/local/venv/bin:$PATH">
+  System PATH variable. In Docker, this includes the virtual environment.
+</ParamField>
+
+## Usage Examples
+
+### Docker Compose
+
+Here's a complete example of configuring the bot using environment variables in `docker-compose.yml`:
+
+```yaml
+services:
+  bot:
+    image: kyrela/fixtweetbot:latest
+    restart: unless-stopped
+    depends_on:
+      - db
+    environment:
+      # Database configuration
+      - DATABASE_HOST=db
+      - DATABASE_PORT=3306
+      - DATABASE_NAME=fixtweetbot
+      - DATABASE_USER=fixtweetbot
+      - DATABASE_PASSWORD=your_secure_password_here
+      
+      # Bot configuration
+      - DISCORD_TOKEN=your_discord_bot_token_here
+      
+      # Optional: Development server ID
+      # - DEV_GUILD=1234567890123456789
+      
+      # Optional: Custom user/group IDs
+      # - UID=1000
+      # - GID=1000
+
+  db:
+    image: mariadb:12.0
+    restart: unless-stopped
+    environment:
+      - MYSQL_DATABASE=fixtweetbot
+      - MYSQL_USER=fixtweetbot
+      - MYSQL_PASSWORD=your_secure_password_here
+      - MYSQL_ROOT_PASSWORD=different_secure_password_here
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:
+    driver: local
+```
+
+### Environment File (.env)
+
+You can also use a `.env` file with Docker Compose:
+
+```bash
+# .env file
+DATABASE_HOST=db
+DATABASE_PORT=3306
+DATABASE_NAME=fixtweetbot
+DATABASE_USER=fixtweetbot
+DATABASE_PASSWORD=your_secure_password_here
+DATABASE_DRIVER=mysql
+DISCORD_TOKEN=your_discord_bot_token_here
+# DEV_GUILD=1234567890123456789
+```
+
+Then reference it in your `docker-compose.yml`:
+
+```yaml
+services:
+  bot:
+    image: kyrela/fixtweetbot:latest
+    env_file:
+      - .env
+```
+
+<Warning>
+Make sure to add `.env` to your `.gitignore` file to prevent committing secrets to version control!
+</Warning>
+
+### Bare Metal Installation
+
+For bare metal installations, environment variables can be set in your shell or service manager:
+
+```bash
+# Set environment variables
+export DATABASE_HOST=localhost
+export DATABASE_PORT=3306
+export DATABASE_NAME=fixtweetbot
+export DATABASE_USER=fixtweetbot
+export DATABASE_PASSWORD=your_secure_password
+export DATABASE_DRIVER=mysql
+export DISCORD_TOKEN=your_discord_bot_token
+
+# Run the bot
+python main.py
+```
+
+<Note>
+For bare metal installations, it's recommended to use `override.config.yml` instead of environment variables for most settings. See the [Configuration Files](/api/configuration/config-file) page for details.
+</Note>
+
+## Security Best Practices
+
+<AccordionGroup>
+  <Accordion title="Never commit secrets to version control">
+    Always use `.gitignore` to exclude files containing sensitive information:
+    
+    ```
+    .env
+    override.config.yml
+    docker-compose.yml
+    ```
+  </Accordion>
+  
+  <Accordion title="Use strong passwords">
+    Generate random, complex passwords for:
+    - `DATABASE_PASSWORD`
+    - `MYSQL_PASSWORD`
+    - `MYSQL_ROOT_PASSWORD`
+    
+    Use different passwords for each!
+  </Accordion>
+  
+  <Accordion title="Protect your Discord token">
+    Your `DISCORD_TOKEN` is extremely sensitive. If compromised:
+    1. Regenerate it immediately in the Discord Developer Portal
+    2. Update your configuration with the new token
+    3. Restart the bot
+  </Accordion>
+  
+  <Accordion title="Limit network exposure">
+    In production:
+    - Don't expose database ports publicly
+    - Use Docker networks to isolate services
+    - Consider using environment variable secrets management (Docker Swarm secrets, Kubernetes secrets, etc.)
+  </Accordion>
+</AccordionGroup>
+
+## Priority and Overrides
+
+When multiple configuration methods are used, they are applied in this order (later sources override earlier ones):
+
+1. Default values in `config.yml`
+2. Values in `override.config.yml`
+3. Environment variables
+
+<Info>
+Environment variables have the highest priority and will override both configuration files.
+</Info>

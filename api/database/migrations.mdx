@@ -1,0 +1,351 @@
+---
+title: Database Migrations
+description: Guide to running and managing database migrations for FixTweetBot
+---
+
+FixTweetBot uses [Masonite ORM](https://orm.masoniteproject.com/) for database migrations. This guide covers how to run migrations and understand the migration system.
+
+## Running Migrations
+
+To initialize or update the database schema, run the following command from the project root:
+
+```bash
+masonite-orm migrate -C database/config.py -d database/migrations
+```
+
+<ParamField path="-C" type="string">
+  Path to the database configuration file (`database/config.py`)
+</ParamField>
+
+<ParamField path="-d" type="string">
+  Path to the migrations directory (`database/migrations`)
+</ParamField>
+
+<Note>
+  Make sure your database connection is properly configured in `override.config.yml` before running migrations.
+</Note>
+
+## Database Configuration
+
+The database configuration is loaded from `database/config.py`, which reads settings from your `override.config.yml` file:
+
+```yaml
+database:
+  host: <your_database_host>
+  driver: <your_database_driver>  # mysql, postgresql, sqlite, etc.
+  database: <your_database_name>
+  user: <your_database_user>
+  password: <your_database_password>
+  port: <your_database_port>
+```
+
+**Supported drivers:**
+- `mysql` - MySQL/MariaDB (recommended)
+- `postgresql` - PostgreSQL
+- `sqlite` - SQLite
+- `mssql` - Microsoft SQL Server
+
+## Migration File Naming
+
+Migration files follow a timestamp-based naming convention:
+
+```
+YYYY_MM_DD_HHMMSS_description.py
+```
+
+**Example:**
+```
+2023_11_17_092808_guilds_table.py
+2024_06_24_175057_members_table.py
+2025_03_16_211708_create_events.py
+```
+
+This ensures migrations run in chronological order.
+
+## Available Migrations
+
+Here's a complete list of migrations in the FixTweetBot database:
+
+### Core Tables (2023)
+
+<Accordion title="2023_11_17_092808_guilds_table.py">
+  Creates the main `guilds` table to store Discord server configurations.
+  
+  **Fields:**
+  - `id` (bigint) - Discord guild ID
+  - `created_at`, `updated_at` - Timestamps
+</Accordion>
+
+<Accordion title="2023_11_17_094206_text_channels_table.py">
+  Creates the `text_channels` table for channel-specific settings.
+  
+  **Fields:**
+  - `id` (bigint) - Discord channel ID
+  - `guild_id` (bigint) - Foreign key to guilds
+  - `fix_twitter` (boolean) - Initial Twitter fixing toggle
+  - Timestamps
+</Accordion>
+
+<Accordion title="2023_11_19_180926_import_json.py">
+  Imports existing data from JSON format (legacy migration).
+</Accordion>
+
+### Guild Settings (2024)
+
+<Accordion title="2024_06_19_182807_guild_settings.py">
+  Adds core guild behavior settings.
+  
+  **Adds:**
+  - `original_message` (enum) - How to handle original messages
+  - `reply` (boolean) - Whether to reply to messages
+</Accordion>
+
+<Accordion title="2024_06_22_154629_channels_enabled.py">
+  Adds channel enable/disable functionality.
+</Accordion>
+
+<Accordion title="2024_06_22_155714_websites_option.py">
+  Adds per-website configuration options.
+</Accordion>
+
+### Members & Roles (2024)
+
+<Accordion title="2024_06_24_175057_members_table.py">
+  Creates the `members` table for user-specific settings.
+  
+  **Fields:**
+  - `id` (bigint) - Discord user ID
+  - `guild_id` (bigint) - Foreign key to guilds
+  - `enabled` (boolean) - Whether member is enabled
+  - Timestamps
+</Accordion>
+
+<Accordion title="2024_06_25_131246_custom_websites_table.py">
+  Creates the `custom_websites` table for custom domain fixing.
+  
+  **Fields:**
+  - `id` (auto-increment)
+  - `guild_id` (bigint)
+  - `name` (string) - Website display name
+  - `domain` (string) - Original domain
+  - `fix_domain` (string) - Fixed domain
+  - Timestamps
+</Accordion>
+
+<Accordion title="2024_08_29_005648_default_states.py">
+  Adds default enable/disable states for channels and members.
+</Accordion>
+
+<Accordion title="2024_08_30_133515_roles_table.py">
+  Creates the `roles` table for role-based filtering.
+  
+  **Fields:**
+  - `id` (bigint) - Discord role ID
+  - `guild_id` (bigint)
+  - `enabled` (boolean)
+  - Timestamps
+</Accordion>
+
+<Accordion title="2024_08_30_143125_default_role_state.py">
+  Adds default role state configuration.
+</Accordion>
+
+### Website Views (2024-2025)
+
+<Accordion title="2024_09_02_143111_websites_and_views.py">
+  Adds view mode settings for Twitter, TikTok, and other platforms.
+</Accordion>
+
+<Accordion title="2024_11_02_214523_remove_instagram_view.py">
+  Removes Instagram view setting (temporary change).
+</Accordion>
+
+<Accordion title="2024_11_02_220821_add_bluesky_view.py">
+  Adds Bluesky view mode settings.
+</Accordion>
+
+<Accordion title="2025_01_06_222619_new_bluesky_view.py">
+  Updates Bluesky view options.
+</Accordion>
+
+<Accordion title="2025_01_11_221023_add_snapchat.py">
+  Adds Snapchat support and view settings.
+</Accordion>
+
+### Major Refactoring (2025)
+
+<Accordion title="2025_01_26_140544_refacto_members.py">
+  **Major refactoring:** Changes members table structure.
+  
+  **Changes:**
+  - Adds auto-incrementing `id` primary key
+  - Renames Discord user ID to `user_id`
+  - Migrates all existing data
+  
+  This allows multiple member records per user across different guilds.
+</Accordion>
+
+<Accordion title="2025_01_26_223431_add_more_websites.py">
+  Adds support for additional social media platforms.
+</Accordion>
+
+### Recent Features (2025-2026)
+
+<Accordion title="2025_03_16_145300_add_twitch_spotify.py">
+  Adds Twitch and Spotify support.
+</Accordion>
+
+<Accordion title="2025_03_16_211708_create_events.py">
+  Creates the `events` table for analytics.
+  
+  **Fields:**
+  - `name` (text) - Event name
+  - `created_at`, `updated_at` - Timestamps
+</Accordion>
+
+<Accordion title="2025_03_16_234024_add_bot_members.py">
+  Adds bot tracking to members table.
+</Accordion>
+
+<Accordion title="2025_03_18_133740_add_webhook_support.py">
+  Adds webhook support (premium feature).
+</Accordion>
+
+<Accordion title="2025_06_03_021604_add_silent_replies.py">
+  Adds silent reply functionality.
+</Accordion>
+
+### Allow/Deny Lists (2025)
+
+<Accordion title="2025_06_08_104941_deny_allow_lists_guilds.py">
+  **Major feature:** Implements allow/deny list system for guilds.
+  
+  **Adds:**
+  - `keywords` (json) - Keyword filter list
+  - `keywords_use_allow_list` (boolean)
+  - `text_channels_use_allow_list` (boolean)
+  - `members_use_allow_list` (boolean)
+  - `roles_use_allow_list` (boolean)
+  - `roles_use_any_rule` (boolean)
+  
+  Migrates from old `default_*_state` fields to new list system.
+</Accordion>
+
+<Accordion title="2025_06_08_121508_deny_allow_lists_roles.py">
+  Adds `on_deny_list` and `on_allow_list` fields to roles table.
+  
+  Migrates from `enabled` boolean to flexible list system.
+</Accordion>
+
+<Accordion title="2025_06_08_121619_deny_allow_lists_members.py">
+  Adds `on_deny_list` and `on_allow_list` fields to members table.
+</Accordion>
+
+<Accordion title="2025_06_08_121630_deny_allow_lists_text_channels.py">
+  Adds `on_deny_list` and `on_allow_list` fields to text channels table.
+</Accordion>
+
+### Additional Features (2025-2026)
+
+<Accordion title="2025_07_14_184543_embedez_direct_view_translation.py">
+  Adds direct view and translation support for EmbedEZ websites.
+</Accordion>
+
+<Accordion title="2025_07_27_183141_new_embedez_websites.py">
+  Adds new websites supported by EmbedEZ service.
+</Accordion>
+
+<Accordion title="2025_11_14_113500_add_imageboards.py">
+  Adds support for imageboards (Danbooru, Gelbooru, e621, etc.).
+</Accordion>
+
+<Accordion title="2026_01_17_145525_add_pinterest.py">
+  Adds Pinterest support and view settings.
+</Accordion>
+
+<Accordion title="2026_01_28_225822_add_newgrounds.py">
+  Adds Newgrounds platform support.
+</Accordion>
+
+<Accordion title="2026_02_03_224729_add_events_data.py">
+  Adds `data` (json) field to events table for storing event metadata.
+</Accordion>
+
+<Accordion title="2026_02_03_235540_add_instagram_view.py">
+  Re-adds Instagram view mode settings.
+</Accordion>
+
+## Migration Best Practices
+
+<Steps>
+  <Step title="Backup First">
+    Always backup your database before running migrations, especially on production.
+    
+    ```bash
+    # Example for MySQL
+    mysqldump -u user -p database_name > backup.sql
+    ```
+  </Step>
+  
+  <Step title="Test in Development">
+    Test migrations in a development environment before applying to production.
+  </Step>
+  
+  <Step title="Check Migration Status">
+    Verify which migrations have been applied:
+    
+    ```bash
+    masonite-orm migrate:status -C database/config.py -d database/migrations
+    ```
+  </Step>
+  
+  <Step title="Run Migrations">
+    Execute pending migrations:
+    
+    ```bash
+    masonite-orm migrate -C database/config.py -d database/migrations
+    ```
+  </Step>
+</Steps>
+
+<Warning>
+  **Important:** Some migrations (like `refacto_members`) perform data migrations that can take time on large databases. Plan accordingly for production deployments.
+</Warning>
+
+## Rolling Back Migrations
+
+To rollback the last batch of migrations:
+
+```bash
+masonite-orm migrate:rollback -C database/config.py -d database/migrations
+```
+
+<Note>
+  Be cautious when rolling back migrations in production, as this may result in data loss.
+</Note>
+
+## Creating New Migrations
+
+If you're extending FixTweetBot and need to create a new migration:
+
+```bash
+masonite-orm migration create_your_table -C database/config.py -d database/migrations
+```
+
+This will create a new migration file with the current timestamp.
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Connection Error">
+    Verify your database credentials in `override.config.yml` and ensure the database server is running.
+  </Accordion>
+  
+  <Accordion title="Migration Already Applied">
+    Check the `migrations` table in your database to see which migrations have been run.
+  </Accordion>
+  
+  <Accordion title="Foreign Key Constraint Failed">
+    Ensure migrations are run in order. The timestamp prefix ensures correct ordering.
+  </Accordion>
+</AccordionGroup>

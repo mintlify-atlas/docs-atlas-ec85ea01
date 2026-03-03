@@ -1,0 +1,566 @@
+---
+title: Custom Websites
+description: Add support for additional websites with custom embedding services
+icon: globe
+---
+
+## Overview
+
+Custom websites allow you to extend FixTweetBot to support **any website** with a compatible embedding service. This is perfect for:
+
+- Niche social media platforms
+- Region-specific services
+- Self-hosted fixer services
+- Websites not yet officially supported
+
+<Info>
+Custom websites use the same URL replacement system as built-in websites. The bot detects links and replaces the domain with your custom fixer domain.
+</Info>
+
+## How Custom Websites Work
+
+<Steps>
+  <Step title="Bot detects a link">
+    User posts a message containing a link from your custom website.
+    
+    Example: `https://example.com/post/12345`
+  </Step>
+  
+  <Step title="Domain replacement">
+    The bot replaces the original domain with your custom fixer domain.
+    
+    Example: `https://example.com/post/12345` → `https://fxexample.com/post/12345`
+  </Step>
+  
+  <Step title="Fixed link is posted">
+    The bot posts the fixed link, and Discord fetches the embed from your fixer service.
+  </Step>
+</Steps>
+
+<Tip>
+The fixer service you use must return proper OpenGraph tags or oEmbed data for Discord to generate embeds.
+</Tip>
+
+## Accessing Custom Websites
+
+```
+/settings → Websites → Custom Websites
+```
+
+The Custom Websites settings page shows:
+- List of all configured custom websites (up to 25)
+- Name, domain, and fixer domain for each
+- Options to add, edit, and delete websites
+
+## Adding a Custom Website
+
+<Steps>
+  <Step title="Open settings">
+    Use `/settings` → Websites → Select "Custom Websites" from the dropdown
+  </Step>
+  
+  <Step title="Click Add Website">
+    Click the **Add Website** button (requires Premium after 3 websites)
+  </Step>
+  
+  <Step title="Fill in the modal">
+    Enter the following information:
+    
+    **Name** (optional, max 36 characters):
+    - Display name for the website
+    - Example: `"My Custom Site"`
+    
+    **Domain** (required, max 61 characters):
+    - The original website domain
+    - Example: `example.com` or `www.example.com`
+    
+    **Fix Domain** (required, max 61 characters):
+    - The fixer service domain
+    - Example: `fxexample.com`
+  </Step>
+  
+  <Step title="Submit">
+    Click Submit to save the custom website.
+  </Step>
+</Steps>
+
+<Note>
+Domains are automatically cleaned:
+- `http://` and `https://` are removed
+- `www.` prefix is removed
+- Trailing `/` is removed
+
+Example: `https://www.example.com/` becomes `example.com`
+</Note>
+
+## Configuration Details
+
+### Name Field
+
+<Tabs>
+  <Tab title="Purpose">
+    The name is a **display label** for your reference. It appears in:
+    - The custom websites list
+    - The selection dropdown
+    - Troubleshooting view
+  </Tab>
+  
+  <Tab title="Requirements">
+    - **Optional:** You can leave it blank
+    - **Max length:** 36 characters
+    - Can include any characters
+  </Tab>
+  
+  <Tab title="Examples">
+    - `"Pixiv (JP)"`
+    - `"Company Intranet"`
+    - `"News Site"`
+    - `"Testing Service"`
+  </Tab>
+</Tabs>
+
+### Domain Field
+
+<Tabs>
+  <Tab title="Purpose">
+    The **original domain** that should be detected and replaced.
+    
+    When users post links from this domain, the bot will process them.
+  </Tab>
+  
+  <Tab title="Requirements">
+    - **Required:** Cannot be blank
+    - **Max length:** 61 characters
+    - Must be a valid domain format
+    - Will be cleaned automatically (no `http://`, `www.`, or trailing `/`)
+  </Tab>
+  
+  <Tab title="Examples">
+    **Input:** Any of these formats work
+    ```
+    example.com
+    www.example.com
+    https://example.com
+    https://www.example.com/
+    ```
+    
+    **Stored as:**
+    ```
+    example.com
+    ```
+  </Tab>
+</Tabs>
+
+### Fix Domain Field
+
+<Tabs>
+  <Tab title="Purpose">
+    The **fixer service domain** that provides embeds.
+    
+    This is where the bot will redirect links for embedding.
+  </Tab>
+  
+  <Tab title="Requirements">
+    - **Required:** Cannot be blank
+    - **Max length:** 61 characters
+    - Must be a valid domain format
+    - Should point to a working embedding service
+    - Will be cleaned automatically
+  </Tab>
+  
+  <Tab title="Examples">
+    **Input:**
+    ```
+    fxexample.com
+    https://fixer.example.com
+    www.example-fixer.com
+    ```
+    
+    **Stored as:**
+    ```
+    fxexample.com
+    fixer.example.com
+    example-fixer.com
+    ```
+  </Tab>
+</Tabs>
+
+## Example Configurations
+
+<AccordionGroup>
+  <Accordion title="Nitter Instance (Twitter Alternative)">
+    **Use case:** Fix links from a custom Nitter instance
+    
+    ```yaml
+    Name: "Nitter Custom"
+    Domain: nitter.example.com
+    Fix Domain: fxtwitter.com
+    ```
+    
+    **Result:**
+    ```
+    https://nitter.example.com/user/status/123
+    ↓
+    https://fxtwitter.com/user/status/123
+    ```
+  </Accordion>
+  
+  <Accordion title="Custom Mastodon Instance">
+    **Use case:** Fix links from your Mastodon server
+    
+    ```yaml
+    Name: "Mastodon (Internal)"
+    Domain: social.company.com
+    Fix Domain: fx.zillanlabs.tech/social.company.com
+    ```
+    
+    **Result:**
+    ```
+    https://social.company.com/@user/123
+    ↓
+    https://fx.zillanlabs.tech/social.company.com/@user/123
+    ```
+  </Accordion>
+  
+  <Accordion title="Self-Hosted Fixer">
+    **Use case:** Use your own fixer service
+    
+    ```yaml
+    Name: "Internal Media"
+    Domain: media.internal.com
+    Fix Domain: fixer.internal.com
+    ```
+    
+    **Result:**
+    ```
+    https://media.internal.com/post/456
+    ↓
+    https://fixer.internal.com/post/456
+    ```
+  </Accordion>
+  
+  <Accordion title="Regional Service">
+    **Use case:** Support a region-specific platform
+    
+    ```yaml
+    Name: "Weibo CN"
+    Domain: weibo.cn
+    Fix Domain: embedez.com/weibo.cn
+    ```
+    
+    **Result:**
+    ```
+    https://weibo.cn/user/post/789
+    ↓
+    https://embedez.com/weibo.cn/user/post/789
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Managing Custom Websites
+
+### Editing a Custom Website
+
+<Steps>
+  <Step title="Select the website">
+    Use the dropdown to select the custom website you want to edit.
+  </Step>
+  
+  <Step title="Click Edit">
+    Click the **Edit Website** button.
+  </Step>
+  
+  <Step title="Modify fields">
+    Update the name, domain, or fix domain as needed.
+  </Step>
+  
+  <Step title="Submit changes">
+    Click Submit to save your changes.
+  </Step>
+</Steps>
+
+<Warning>
+Changing the domain will affect all future links. Existing messages are not retroactively updated.
+</Warning>
+
+### Deleting a Custom Website
+
+<Steps>
+  <Step title="Select the website">
+    Use the dropdown to select the custom website you want to delete.
+  </Step>
+  
+  <Step title="Click Delete">
+    Click the **Delete** button (red button).
+  </Step>
+  
+  <Step title="Confirm deletion">
+    The website is immediately removed from your configuration.
+  </Step>
+</Steps>
+
+<Note>
+Deleting a custom website cannot be undone. You'll need to re-add it if needed.
+</Note>
+
+## Limits
+
+<CardGroup cols={2}>
+  <Card title="Free Tier" icon="lock">
+    **Maximum:** 3 custom websites
+    
+    Perfect for testing or small use cases.
+  </Card>
+  
+  <Card title="Premium" icon="crown">
+    **Maximum:** 25 custom websites
+    
+    Plenty of room for complex configurations.
+  </Card>
+</CardGroup>
+
+## Technical Details
+
+### URL Matching
+
+The bot matches links using the domain field:
+
+<CodeGroup>
+```text Matches
+Domain: example.com
+
+https://example.com/post/123 ✅
+http://example.com/user/456 ✅
+www.example.com/page ✅
+example.com/post/123 ✅
+```
+
+```text Doesn't Match
+Domain: example.com
+
+https://sub.example.com/post/123 ❌ (subdomain)
+https://example.org/post/123 ❌ (different TLD)
+https://notexample.com/post/123 ❌ (different domain)
+```
+</CodeGroup>
+
+<Tip>
+For subdomain matching, add separate custom website entries for each subdomain.
+</Tip>
+
+### Domain Replacement
+
+The bot performs a simple domain swap:
+
+```
+Original:  https://example.com/path/to/post?param=value
+Domain:    example.com
+Fix Domain: fxexample.com
+Result:    https://fxexample.com/path/to/post?param=value
+```
+
+**Preserved:**
+- Protocol (http/https)
+- Path
+- Query parameters
+- Fragments
+
+**Replaced:**
+- Domain only
+
+### Validation
+
+<Tabs>
+  <Tab title="Domain Uniqueness">
+    You **cannot** have duplicate domains in your configuration.
+    
+    Each domain can only point to one fixer service.
+    
+    **Example:**
+    ```
+    ❌ example.com → fixer1.com
+    ❌ example.com → fixer2.com
+    
+    ✅ example.com → fixer1.com
+    ✅ example2.com → fixer2.com
+    ```
+  </Tab>
+  
+  <Tab title="Length Limits">
+    Field limits are enforced:
+    
+    - Name: 36 characters
+    - Domain: 61 characters
+    - Fix Domain: 61 characters
+    
+    Exceeding these limits will show an error.
+  </Tab>
+  
+  <Tab title="Required Fields">
+    The following fields are required:
+    
+    - Domain ✅
+    - Fix Domain ✅
+    - Name ❌ (optional)
+    
+    Leaving required fields blank will show an error.
+  </Tab>
+</Tabs>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Custom website not working">
+    **Check the following:**
+    
+    1. **Domain is correct:** Verify the domain matches exactly
+    2. **Fixer service is online:** Test the fixer URL manually in a browser
+    3. **Embed is valid:** Ensure the fixer returns proper OpenGraph/oEmbed data
+    4. **Website is selected:** In Troubleshooting, verify the custom website appears in the list
+  </Accordion>
+  
+  <Accordion title="Error: Domain already exists">
+    You're trying to add a domain that's already configured.
+    
+    **Solutions:**
+    - Edit the existing custom website instead
+    - Delete the existing website first
+    - Use a different domain/subdomain
+  </Accordion>
+  
+  <Accordion title="Embed not showing">
+    The bot posts the fixed link, but Discord doesn't show an embed.
+    
+    **Common causes:**
+    1. **Fixer service down:** The embedding service may be offline
+    2. **Invalid metadata:** The fixer isn't returning proper OpenGraph tags
+    3. **Discord cache:** Discord may have cached an old/invalid embed
+    4. **Rate limiting:** The fixer service may be rate-limited
+    
+    **Solutions:**
+    - Test the fixer URL directly in Discord
+    - Check if the fixer service has documentation on supported URLs
+    - Wait a few minutes and try again (Discord cache expires)
+  </Accordion>
+  
+  <Accordion title="Hit the website limit">
+    Free tier: 3 custom websites maximum
+    
+    **Solutions:**
+    - Upgrade to [Premium](/premium) for 25 custom websites
+    - Remove unused custom websites
+    - Prioritize the most important websites
+  </Accordion>
+</AccordionGroup>
+
+## Fixer Service Requirements
+
+For a custom website to work properly, the fixer service must:
+
+<Steps>
+  <Step title="Accept the same URL structure">
+    The fixer should accept the same path/parameters as the original URL.
+    
+    Example:
+    ```
+    Original:  example.com/post/123?lang=en
+    Fixer:     fixer.com/post/123?lang=en
+    ```
+  </Step>
+  
+  <Step title="Return valid metadata">
+    The fixer must return proper OpenGraph tags or oEmbed data.
+    
+    **Minimum OpenGraph tags:**
+    ```html
+    <meta property="og:title" content="..." />
+    <meta property="og:description" content="..." />
+    <meta property="og:image" content="..." />
+    ```
+    
+    **For videos:**
+    ```html
+    <meta property="og:video" content="..." />
+    <meta property="og:video:type" content="video/mp4" />
+    ```
+  </Step>
+  
+  <Step title="Be accessible">
+    The fixer service must be:
+    - Publicly accessible (or accessible to Discord's servers)
+    - Not blocked by Discord
+    - Reasonably fast (< 5 seconds response time)
+  </Step>
+</Steps>
+
+<Info>
+Most existing fixer services (FxTwitter, InstaFix, fxTikTok, etc.) follow these standards and can be used as reference implementations.
+</Info>
+
+## Common Use Cases
+
+<CardGroup cols={2}>
+  <Card title="Alternative Frontends" icon="arrows-rotate">
+    Support privacy-friendly frontends like Nitter, Invidious, or Teddit by pointing them to appropriate fixers.
+  </Card>
+  
+  <Card title="Self-Hosted Services" icon="server">
+    Connect your self-hosted media or social platforms with custom fixer services.
+  </Card>
+  
+  <Card title="Regional Platforms" icon="earth-asia">
+    Add support for region-specific social media that may not be officially supported yet.
+  </Card>
+  
+  <Card title="Testing" icon="flask">
+    Test new fixer services before they're officially added to FixTweetBot.
+  </Card>
+</CardGroup>
+
+## Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Test First" icon="vial">
+    Always test the fixer service manually before adding it to FixTweetBot.
+  </Card>
+  
+  <Card title="Use Descriptive Names" icon="tag">
+    Give custom websites clear names to identify them easily.
+  </Card>
+  
+  <Card title="Document Your Config" icon="book">
+    Keep notes on why you added each custom website and what it does.
+  </Card>
+  
+  <Card title="Monitor Reliability" icon="chart-line">
+    Check if your custom fixer services remain online and working.
+  </Card>
+  
+  <Card title="Clean Up Unused" icon="broom">
+    Remove custom websites you no longer need to stay within limits.
+  </Card>
+  
+  <Card title="Report Issues" icon="bug">
+    If a fixer service breaks, report it to the service maintainer.
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Supported Websites" icon="earth-americas" href="/features/supported-platforms">
+    Check if your website is already officially supported
+  </Card>
+  
+  <Card title="Settings Guide" icon="sliders" href="/usage/settings">
+    Learn about other configuration options
+  </Card>
+  
+  <Card title="Filtering" icon="filter" href="/usage/filtering">
+    Control where custom websites are processed
+  </Card>
+  
+  <Card title="Get Premium" icon="crown" href="/features/premium">
+    Unlock 25 custom websites
+  </Card>
+</CardGroup>

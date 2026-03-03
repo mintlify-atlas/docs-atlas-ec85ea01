@@ -1,0 +1,138 @@
+---
+title: Introduction
+description: Fix social media embeds in Discord with better video playback, image galleries, and more
+---
+
+
+# Welcome to FixTweetBot
+
+FixTweetBot is a Discord bot that automatically fixes social media embeds using online services like FxTwitter. When you share a link from Twitter, Instagram, TikTok, or 30+ other platforms, the bot reposts it with a 'fixed' version that provides better embeds - allowing videos to play directly in Discord, displaying image galleries, and much more.
+
+<CardGroup cols={2}>
+  <Card
+    title="Quickstart"
+    icon="rocket"
+    href="/quickstart"
+  >
+    Get the bot running in your server in under 2 minutes
+  </Card>
+  <Card
+    title="Features"
+    icon="sparkles"
+    href="/features/supported-platforms"
+  >
+    Explore 30+ supported platforms and customization options
+  </Card>
+  <Card
+    title="Self-hosting"
+    icon="server"
+    href="/self-hosting/docker"
+  >
+    Run your own instance with Docker or bare metal
+  </Card>
+  <Card
+    title="Commands"
+    icon="terminal"
+    href="/api/commands/settings"
+  >
+    Learn about /settings, /about, and more
+  </Card>
+</CardGroup>
+
+## What makes FixTweetBot different?
+
+FixTweetBot stands out with its extensive platform support and deep customization:
+
+### Massive platform support
+
+Supports 30+ platforms including Twitter, Instagram, TikTok, Reddit, Threads, Bluesky, Snapchat, Facebook, Pixiv, Twitch, Spotify, DeviantArt, Newgrounds, Mastodon, Tumblr, BiliBili, Pinterest, IFunny, YouTube, Imgur, Weibo, Fur Affinity, and various imageboards (Rule34.xxx, Danbooru, Gelbooru, e621, e926, Realbooru, Hypnohub, Konachan, Yande.re, Derpibooru, Rule34.paheal, XBooru, TBIB). Plus custom websites of your choice.
+
+### Advanced customization
+
+<CardGroup cols={2}>
+  <Card icon="sliders">
+    **Flexible filtering**
+    
+    Disable by website, channel, member, role, or keyword
+  </Card>
+  <Card icon="language">
+    **Post translation**
+    
+    Automatically translate posts into your server's language
+  </Card>
+  <Card icon="palette">
+    **Embed views**
+    
+    Choose between normal, direct media, gallery, or text-only views
+  </Card>
+  <Card icon="trash">
+    **Original message**
+    
+    Keep it, remove embeds, or delete the original entirely
+  </Card>
+</CardGroup>
+
+### Modern interface
+
+Manage all settings through an intuitive `/settings` command with interactive components - no complex configuration files needed.
+
+### Privacy focused
+
+- Respects markdown formatting in your messages
+- Source-available codebase you can audit
+- Self-hostable for complete control
+- Can respond to bots and webhooks (premium)
+
+## How it works
+
+The bot monitors messages for social media links and automatically:
+
+1. Detects compatible URLs from 30+ platforms
+2. Generates a 'fixed' link using the appropriate fixer service
+3. Posts the fixed link with better embeds
+4. Optionally suppresses or deletes the original message
+
+<Note>
+You can prevent the bot from fixing specific links by adding `fxignore` anywhere in your message.
+</Note>
+
+## Supported fixers
+
+FixTweetBot relies on excellent open-source fixer services:
+
+- **FxTwitter** - Twitter/X posts with better video embeds
+- **InstaFix** - Instagram posts and reels
+- **fxTikTok** - TikTok videos with direct playback
+- **vxreddit** - Reddit posts with embedded media
+- **FixThreads** - Threads posts
+- **VixBluesky** - Bluesky posts with media
+- **EmbedEZ** - Multi-platform support for Snapchat, IFunny, Imgur, Weibo, and imageboards
+- **And 15+ more** - See the [full list](/features/supported-platforms#fixer-services)
+
+<Info>
+FixTweetBot is not affiliated with any of these fixer services. Please consider supporting their developers!
+</Info>
+
+## Multilingual support
+
+The bot interface is available in English, French, Polish, Russian, Spanish, Vietnamese, Chinese (Simplified & Traditional), Portuguese (Brazil), and Japanese.
+
+<Tip>
+Want to help translate? [Contribute on Crowdin](https://crowdin.com/project/fixtweetbot)
+</Tip>
+
+## Open source
+
+FixTweetBot is source-available on GitHub. You can review the code, report issues, or contribute improvements.
+
+[View on GitHub](https://github.com/Kyrela/FixTweetBot) • [Join Support Server](https://discord.gg/3ej9JrkF3U)
+
+## Ready to get started?
+
+<Card
+  title="Add FixTweetBot to your server"
+  icon="discord"
+  href="/quickstart"
+>
+  Follow our quickstart guide to set up the bot in minutes
+</Card>

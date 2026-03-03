@@ -1,0 +1,342 @@
+---
+title: '/settings Command'
+description: 'Configure FixTweetBot settings for your Discord server'
+---
+
+## Overview
+
+The `/settings` command provides an interactive interface to configure all FixTweetBot settings for your Discord server. This command opens a comprehensive settings panel with multiple configuration options organized by category.
+
+## Command Details
+
+### Syntax
+
+```
+/settings
+```
+
+### Permissions Required
+
+- **Manage Messages** - Required to execute this command
+- **Guild Only** - This command can only be used in Discord servers, not in DMs
+
+### Implementation
+
+The command is implemented in `cogs/commands.py:27-35` and uses the `SettingsView` class from `src/settings.py` to render the interactive settings interface.
+
+```python
+@discore.app_commands.command(
+    name=tstr('settings.command.name'),
+    description=tstr('settings.command.description'))
+@discore.app_commands.guild_only()
+@discore.app_commands.default_permissions(manage_messages=True)
+async def settings(self, i: discore.Interaction):
+    entrypoint_context.set(f"command settings {{interaction={i!r}}}")
+    await Event.buff_cr({'name': 'command_settings'})
+    await SettingsView(i).send(i)
+```
+
+## Settings Interface
+
+The settings interface is an ephemeral (only visible to you) interactive message that automatically deletes after 3 minutes of inactivity. The interface consists of:
+
+1. **Category Selection** - A dropdown menu to select different setting categories
+2. **Interactive Controls** - Buttons, selects, and modals specific to each setting
+3. **Real-time Preview** - Settings are saved immediately and reflected in the embed
+
+### Available Setting Categories
+
+The settings are organized into the following categories (implemented in `src/settings.py:1741-1751`):
+
+#### 1. Troubleshooting
+
+**Purpose**: Diagnostic tool to check bot configuration and permissions
+
+**Features**:
+- Bot latency/ping display
+- Permission verification for the current channel
+- Filter status overview (channels, members, roles, keywords)
+- Website enable/disable status
+- Premium status check
+- Custom websites list
+- Interactive channel and member selectors for testing
+
+**Controls**:
+- **Refresh** button - Updates diagnostic information
+- **Support** button - Links to support server
+- **Premium** button - Available for non-premium servers
+- **Channel selector** - Test permissions in different channels
+- **Member selector** - Test member-specific filters
+
+**Implementation**: `TroubleshootingSetting` class (`src/settings.py:380-561`)
+
+#### 2. Channels
+
+**Purpose**: Control which channels the bot responds in
+
+**Features**:
+- Enable/disable bot responses per channel
+- Allow list or deny list mode (Premium)
+- Supports text channels, voice channels, threads, and forum posts
+- Channel-specific permission checking
+
+**Controls**:
+- **Toggle** button - Enable/disable selected channel
+- **Toggle Default** button - Switch between allow/deny list mode (Premium)
+- **Reset** button - Clear all channel filters (requires confirmation)
+- **Channel selector** - Select channel to configure
+
+**Required Permissions** (checked automatically):
+- `view_channel`
+- `send_messages`
+- `embed_links`
+- `send_messages_in_threads` (for threads)
+
+**Implementation**: `ChannelSetting` class (`src/settings.py:746-786`)
+
+#### 3. Members
+
+**Purpose**: Control which members the bot responds to
+
+**Features**:
+- Enable/disable bot responses for specific members
+- Allow list or deny list mode (Premium)
+- Bot filtering requires Premium
+- Member-specific filtering
+
+**Controls**:
+- **Toggle** button - Enable/disable selected member
+- **Toggle Default** button - Switch between allow/deny list mode (Premium)
+- **Reset** button - Clear all member filters
+- **Member selector** - Select member to configure
+
+**Implementation**: `MemberSetting` class (`src/settings.py:683-743`)
+
+#### 4. Roles
+
+**Purpose**: Control which roles the bot responds to
+
+**Features**:
+- Enable/disable bot responses for specific roles
+- Allow list or deny list mode (Premium)
+- "Any" vs "All" rule mode (Premium)
+  - **Any**: User needs at least one allowed role
+  - **All**: User needs all their roles to be allowed
+
+**Controls**:
+- **Toggle** button - Enable/disable selected role
+- **Toggle Default** button - Switch between allow/deny list mode (Premium)
+- **Toggle Rule** button - Switch between Any/All rule (Premium)
+- **Reset** button - Clear all role filters
+- **Role selector** - Select role to configure
+
+**Implementation**: `RoleSetting` class (`src/settings.py:788-857`)
+
+#### 5. Keywords
+
+**Purpose**: Filter messages by keywords
+
+**Features**:
+- Add up to 3 keywords (free) or 25 keywords (Premium)
+- Allow list or deny list mode (Premium)
+  - **Allow list**: Only respond to messages containing these keywords
+  - **Deny list**: Don't respond to messages containing these keywords
+- Maximum 50 characters per keyword
+
+**Controls**:
+- **Keyword selector** - View and select keywords
+- **Add** button - Add new keyword (opens modal)
+- **Edit** button - Edit selected keyword (opens modal)
+- **Delete** button - Remove selected keyword
+- **Toggle Mode** button - Switch between allow/deny list (Premium)
+
+**Implementation**: `KeywordsSetting` class (`src/settings.py:902-1055`)
+
+#### 6. Websites
+
+**Purpose**: Configure which social media platforms to process
+
+**Sub-settings** (each can be individually enabled/disabled):
+
+**Custom Websites** (`src/settings.py:1541-1662`)
+- Add custom domain redirects (up to 3 free, 25 Premium)
+- Define custom domain to fix-domain mappings
+- Useful for self-hosted proxy services
+
+**Supported Platforms**:
+- **Twitter/X** (`TwitterSetting`) - Uses FxTwitter, supports translation and view modes
+- **Instagram** (`InstagramSetting`) - Uses InstaFix, supports view modes
+- **TikTok** (`TikTokSetting`) - Uses fxTikTok, supports view modes
+- **Reddit** (`RedditSetting`) - Uses vxreddit
+- **Threads** (`ThreadsSetting`) - Uses FixThreads
+- **Bluesky** (`BlueskySetting`) - Uses VixBluesky, supports view modes
+- **Snapchat** (`SnapchatSetting`) - Uses EmbedEZ, supports translation and view modes
+- **Facebook** (`FacebookSetting`) - Uses facebed
+- **Pinterest** (`PinterestSetting`) - Uses EmbedEZ, supports translation and view modes
+- **Pixiv** (`PixivSetting`) - Uses phixiv
+- **Twitch** (`TwitchSetting`) - Uses fxtwitch
+- **Spotify** (`SpotifySetting`) - Uses fxspotify
+- **DeviantArt** (`DeviantArtSetting`) - Uses fixDeviantArt
+- **Newgrounds** (`NewgroundsSetting`) - Uses FixNewgrounds
+- **Mastodon** (`MastodonSetting`) - Uses FxMastodon
+- **Tumblr** (`TumblrSetting`) - Uses fxtumblr
+- **BiliBili** (`BilibiliSetting`) - Uses BiliFix
+- **Weibo** (`WeiboSetting`) - Uses EmbedEZ, supports translation and view modes
+- **Imgur** (`ImgurSetting`) - Uses EmbedEZ, supports translation and view modes
+- **iFunny** (`IFunnySetting`) - Uses EmbedEZ, supports translation and view modes
+- **YouTube** (`YouTubeSetting`) - Uses Koutube
+- **Fur Affinity** (`FurAffinitySetting`) - Uses xfuraffinity
+- **Imageboards** (`ImageboardsSetting`) - Uses EmbedEZ, supports view modes
+
+**Website Controls** (for each platform):
+- **Enable/Disable** button - Toggle platform processing
+- **Translation** button - Enable translation (for supported platforms)
+- **Language** button - Set translation target language (for supported platforms)
+- **View selector** - Choose embed view style (for supported platforms)
+
+**View Modes** (platform-dependent):
+- **Simple** - Basic embed with minimal information
+- **Standard** - Default embed with standard information
+- **Gallery** - Optimized for images/videos
+- **Detailed** - Maximum information display
+
+**Implementation**: `WebsiteSettings` class aggregates all website settings (`src/settings.py:1664-1731`)
+
+#### 7. Original Message
+
+**Purpose**: Configure what happens to the original message containing links
+
+**Options**:
+- **Delete** - Delete the original message (requires `manage_messages` permission)
+- **Remove Embeds** - Suppress embeds on original message (requires `manage_messages` permission)
+- **Nothing** - Leave the original message unchanged
+
+**Controls**:
+- **Option selector** - Choose behavior for original messages
+
+**Implementation**: `OriginalMessageBehaviorSetting` class (`src/settings.py:1057-1118`)
+
+#### 8. Reply Method
+
+**Purpose**: Configure how the bot sends responses
+
+**Options**:
+- **Reply to Message** - Bot replies to the original message (requires `read_message_history` permission)
+- **Reply Silently** - Bot sends replies without pinging the author
+
+**Controls**:
+- **Toggle Reply** button - Enable/disable replying to messages
+- **Toggle Silent** button - Enable/disable silent replies
+
+**Implementation**: `ReplyMethodSetting` class (`src/settings.py:1120-1190`)
+
+#### 9. Webhooks
+
+**Purpose**: Control whether the bot responds to webhook messages
+
+**Features**:
+- Enable/disable processing of webhook messages
+- Useful for integration with other bots
+
+**Controls**:
+- **Toggle** button - Enable/disable webhook processing
+
+**Implementation**: `WebhooksSetting` class (`src/settings.py:1192-1238`)
+
+## Technical Details
+
+### Architecture
+
+The settings system uses a hierarchical architecture:
+
+1. **SettingsView** (`src/settings.py:1733-1851`) - Main view controller
+   - Manages the interactive UI
+   - Handles timeout and auto-deletion (3 minutes)
+   - Coordinates between different settings
+
+2. **BaseSetting** (`src/settings.py:45-128`) - Abstract base class for all settings
+   - Defines common interface (embed, items, option)
+   - Provides setting registration and lookup
+
+3. **Specialized Settings** - Inherit from BaseSetting or its subclasses
+   - **WebsiteBaseSetting** - Base for website-specific settings
+   - **GenericFilterSetting** - Base for filter settings (channels, members, roles)
+   - **EmbedEZBaseSetting** - Specialized for EmbedEZ-based websites
+
+### Data Management
+
+**DataElements** class (`src/settings.py:22-43`) provides hybrid access to Discord objects and database models:
+
+- **guild** - Server configuration
+- **member** - Member-specific data
+- **channel** - Channel-specific data
+- **role** - Role-specific data
+- **roles** - All user roles
+
+Each element combines:
+- `discord_object` - Live Discord data
+- `db_object` - Persistent database record
+
+### Callback System
+
+The `edit_callback` utility function attaches action handlers to UI components. When a user interacts with a button or select menu, the callback:
+
+1. Executes the setting's action method
+2. Updates the database
+3. Refreshes the UI with new state
+
+### Auto-timeout
+
+The settings view automatically deletes after 180 seconds of inactivity (`src/settings.py:1793-1807`). The timeout is reset on each interaction.
+
+## Usage Examples
+
+### Basic Setup
+
+1. Run `/settings` in your server
+2. Select "Channels" from the dropdown
+3. Click the channel selector and choose your channel
+4. Click the **Toggle** button to enable/disable the bot in that channel
+
+### Configuring Website Filters
+
+1. Run `/settings`
+2. Select "Websites" from the main dropdown
+3. Select a platform (e.g., "Twitter") from the website dropdown
+4. Click the **Enable** button to activate Twitter link processing
+5. (Optional) Enable **Translation** and set your target language
+6. (Optional) Select a view mode from the dropdown
+
+### Setting Up Keywords
+
+1. Run `/settings`
+2. Select "Keywords" from the dropdown
+3. Click **Add** to create a new keyword
+4. Enter your keyword (max 50 characters) and submit
+5. Repeat for additional keywords (max 3 free, 25 Premium)
+6. Toggle mode to switch between allow/deny list (Premium)
+
+### Permission Troubleshooting
+
+1. Run `/settings`
+2. Select "Troubleshooting" from the dropdown
+3. Review the permissions section for any ⚠️ warnings
+4. Check the filters section to see what's enabled/disabled
+5. Use the channel/member selectors to test different configurations
+
+## Related Implementation Files
+
+- **Command Definition**: `cogs/commands.py:27-35`
+- **Settings View**: `src/settings.py:1733-1851`
+- **Base Setting Classes**: `src/settings.py:45-267`
+- **Filter Settings**: `src/settings.py:563-681` (Generic), `746-857` (Specific implementations)
+- **Website Settings**: `src/settings.py:1240-1731`
+- **Behavior Settings**: `src/settings.py:1057-1238`
+- **Database Models**: `database/models/`
+
+## See Also
+
+- [/about Command](./about) - Display bot information
+- [Configuration Guide](/usage/settings) - User guide for settings
+- [Filtering Guide](/usage/filtering) - Detailed filtering documentation
+- [Custom Websites Guide](/usage/custom-websites) - Adding custom domain redirects

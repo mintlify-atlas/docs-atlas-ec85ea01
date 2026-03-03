@@ -1,0 +1,701 @@
+---
+title: Filtering
+description: Advanced guide to channel, role, member, and keyword filtering
+icon: filter
+---
+
+## Overview
+
+Filtering allows you to control exactly when and where FixTweetBot responds to messages. You can filter by:
+
+- **Channels**: Control which channels the bot operates in
+- **Roles**: Control which roles can trigger the bot
+- **Members**: Control which specific members can use the bot
+- **Keywords**: Control which messages are processed based on content
+
+All filters work together - a message must pass **all active filters** to be processed.
+
+## How Filtering Works
+
+<Steps>
+  <Step title="Message is sent">
+    A user posts a message containing a social media link.
+  </Step>
+  
+  <Step title="Bot checks all filters">
+    The bot checks in order:
+    1. Is the channel allowed?
+    2. Does the member pass the filter?
+    3. Does the member's role(s) pass the filter?
+    4. Does the message content pass keyword filters?
+  </Step>
+  
+  <Step title="All filters must pass">
+    If **any** filter blocks the message, the bot ignores it.
+    
+    If **all** filters pass, the bot processes the link.
+  </Step>
+</Steps>
+
+<Info>
+Filters are evaluated server-side before any link processing occurs, making them very efficient.
+</Info>
+
+## Channel Filtering
+
+Control which channels the bot responds in.
+
+### Access Channel Settings
+
+```
+/settings → Channels
+```
+
+### How It Works
+
+<Tabs>
+  <Tab title="Deny List (Default)">
+    **Default Behavior:** Bot works in **all channels**
+    
+    **Your Control:** Manually disable specific channels
+    
+    **Best For:** Most servers where you want the bot everywhere except a few channels
+    
+    **Example:**
+    ```
+    ✅ #general (enabled by default)
+    ✅ #media (enabled by default)
+    ❌ #off-topic (manually disabled)
+    ❌ #bot-commands (manually disabled)
+    ✅ #memes (enabled by default)
+    ```
+  </Tab>
+  
+  <Tab title="Allow List (Premium)">
+    **Default Behavior:** Bot works in **no channels**
+    
+    **Your Control:** Manually enable specific channels
+    
+    **Best For:** Servers where you only want the bot in specific channels
+    
+    **Example:**
+    ```
+    ❌ #general (disabled by default)
+    ✅ #media (manually enabled)
+    ❌ #off-topic (disabled by default)
+    ✅ #links (manually enabled)
+    ❌ #memes (disabled by default)
+    ```
+  </Tab>
+</Tabs>
+
+### Managing Channel Filters
+
+<Steps>
+  <Step title="Select a channel">
+    Use the **Channel Selector** dropdown to pick any channel in your server.
+  </Step>
+  
+  <Step title="Toggle the channel">
+    Click the **Toggle** button to enable/disable the bot in that channel.
+  </Step>
+  
+  <Step title="Switch modes (Premium)">
+    Click **Toggle Default** to switch between allow-list and deny-list modes.
+  </Step>
+  
+  <Step title="Reset if needed">
+    Click **Reset** twice to clear all channel filters and start fresh.
+  </Step>
+</Steps>
+
+### Required Permissions
+
+The bot needs these permissions in each channel:
+
+<CardGroup cols={2}>
+  <Card title="Basic" icon="check">
+    - View Channel
+    - Send Messages
+    - Embed Links
+  </Card>
+  
+  <Card title="Additional" icon="plus">
+    - Send Messages in Threads (for threads)
+    - Manage Messages (if using embed removal/deletion)
+    - Read Message History (if using reply mode)
+  </Card>
+</CardGroup>
+
+<Warning>
+If the bot lacks permissions in a channel, it will show a ⚠️ warning in the settings menu.
+</Warning>
+
+### Common Scenarios
+
+<AccordionGroup>
+  <Accordion title="Disable bot in one channel">
+    1. Use `/settings` → Channels
+    2. Select the channel from the dropdown
+    3. Click **Toggle** to disable
+    4. Verify it shows ❌ in the dropdown label
+  </Accordion>
+  
+  <Accordion title="Only enable bot in #media channel">
+    1. Get Premium to access allow-list mode
+    2. Use `/settings` → Channels
+    3. Click **Toggle Default** to switch to allow-list
+    4. Select #media channel
+    5. Click **Toggle** to enable it
+  </Accordion>
+  
+  <Accordion title="Enable bot everywhere except #off-topic and #general">
+    1. Use `/settings` → Channels (deny-list mode is default)
+    2. Select #off-topic, click **Toggle** to disable
+    3. Select #general, click **Toggle** to disable
+    4. All other channels remain enabled
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Role Filtering
+
+Control which roles can trigger the bot.
+
+### Access Role Settings
+
+```
+/settings → Roles
+```
+
+### How It Works
+
+<Tabs>
+  <Tab title="Deny List (Default)">
+    **Default Behavior:** Bot responds to **all roles**
+    
+    **Your Control:** Block specific roles
+    
+    **Example:**
+    ```
+    ✅ @Members (enabled by default)
+    ✅ @VIP (enabled by default)
+    ❌ @Muted (manually disabled)
+    ✅ @Moderator (enabled by default)
+    ```
+    
+    Users with @Muted role cannot trigger the bot.
+  </Tab>
+  
+  <Tab title="Allow List (Premium)">
+    **Default Behavior:** Bot responds to **no roles**
+    
+    **Your Control:** Allow specific roles only
+    
+    **Example:**
+    ```
+    ❌ @Members (disabled by default)
+    ✅ @VIP (manually enabled)
+    ✅ @Moderator (manually enabled)
+    ❌ @Guest (disabled by default)
+    ```
+    
+    Only users with @VIP or @Moderator can trigger the bot.
+  </Tab>
+</Tabs>
+
+### Role Matching Rules (Premium)
+
+When a user has **multiple roles**, you can control how they're evaluated:
+
+<Tabs>
+  <Tab title="ALL Rule (Default)">
+    User must match **ALL** enabled roles.
+    
+    **Example with Allow-List:**
+    - ✅ @Members enabled
+    - ✅ @Active enabled
+    
+    **Result:**
+    - User with @Members only: ❌ Blocked (missing @Active)
+    - User with @Active only: ❌ Blocked (missing @Members)
+    - User with both @Members + @Active: ✅ Allowed
+  </Tab>
+  
+  <Tab title="ANY Rule (Premium)">
+    User must match **ANY** enabled role.
+    
+    **Example with Allow-List:**
+    - ✅ @Members enabled
+    - ✅ @Active enabled
+    
+    **Result:**
+    - User with @Members only: ✅ Allowed
+    - User with @Active only: ✅ Allowed
+    - User with both @Members + @Active: ✅ Allowed
+  </Tab>
+</Tabs>
+
+### Managing Role Filters
+
+<Steps>
+  <Step title="Select a role">
+    Use the **Role Selector** dropdown to pick any role in your server.
+  </Step>
+  
+  <Step title="Toggle the role">
+    Click **Toggle** to enable/disable the bot for that role.
+  </Step>
+  
+  <Step title="Switch modes (Premium)">
+    Click **Toggle Default** to switch between allow-list and deny-list.
+  </Step>
+  
+  <Step title="Change matching rule (Premium)">
+    Click **Toggle Rule** to switch between ANY and ALL matching.
+  </Step>
+</Steps>
+
+### Common Scenarios
+
+<AccordionGroup>
+  <Accordion title="Block muted users">
+    1. Use `/settings` → Roles (deny-list mode is default)
+    2. Select @Muted role
+    3. Click **Toggle** to disable
+    4. Users with @Muted role cannot trigger the bot
+  </Accordion>
+  
+  <Accordion title="Only allow VIP and Moderators (Premium)">
+    1. Use `/settings` → Roles
+    2. Click **Toggle Default** to enable allow-list mode
+    3. Select @VIP, click **Toggle** to enable
+    4. Select @Moderator, click **Toggle** to enable
+    5. Click **Toggle Rule** to set to ANY
+    6. Now only users with @VIP OR @Moderator can use the bot
+  </Accordion>
+  
+  <Accordion title="Require both @Member and @Verified (Premium)">
+    1. Use `/settings` → Roles
+    2. Click **Toggle Default** to enable allow-list mode
+    3. Select @Member, click **Toggle** to enable
+    4. Select @Verified, click **Toggle** to enable
+    5. Ensure **Toggle Rule** is set to ALL (default)
+    6. Users need BOTH roles to trigger the bot
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Member Filtering
+
+Control which specific members can trigger the bot.
+
+### Access Member Settings
+
+```
+/settings → Members
+```
+
+### How It Works
+
+<Tabs>
+  <Tab title="Deny List (Default)">
+    **Default Behavior:** Bot responds to **all members**
+    
+    **Your Control:** Block specific members
+    
+    **Example:**
+    ```
+    ✅ @Alice (enabled by default)
+    ❌ @SpamBot (manually disabled)
+    ✅ @Charlie (enabled by default)
+    ```
+  </Tab>
+  
+  <Tab title="Allow List (Premium)">
+    **Default Behavior:** Bot responds to **no members**
+    
+    **Your Control:** Allow specific members only
+    
+    **Example:**
+    ```
+    ✅ @Moderator (manually enabled)
+    ✅ @Admin (manually enabled)
+    ❌ @RegularUser (disabled by default)
+    ```
+  </Tab>
+</Tabs>
+
+### Bot and Webhook Support
+
+By default, the bot **ignores messages from other bots and webhooks**.
+
+To enable responses to bots/webhooks:
+
+<Steps>
+  <Step title="Enable webhooks setting">
+    Go to `/settings` → Webhooks and toggle it on.
+  </Step>
+  
+  <Step title="For bot messages (Premium)">
+    Premium is required to respond to non-webhook bot messages.
+  </Step>
+  
+  <Step title="Configure member filters">
+    Use member filtering to allow/block specific bots.
+  </Step>
+</Steps>
+
+<Info>
+Webhook messages are always allowed when the webhook setting is enabled. Bot messages require Premium.
+</Info>
+
+### Managing Member Filters
+
+<Steps>
+  <Step title="Select a member">
+    Use the **Member Selector** dropdown to pick any member.
+  </Step>
+  
+  <Step title="Toggle the member">
+    Click **Toggle** to enable/disable the bot for that member.
+    
+    <Note>Toggling bot members requires Premium.</Note>
+  </Step>
+  
+  <Step title="Switch modes (Premium)">
+    Click **Toggle Default** to switch between allow-list and deny-list.
+  </Step>
+</Steps>
+
+---
+
+## Keyword Filtering
+
+Filter messages based on keywords in the message content.
+
+### Access Keyword Settings
+
+```
+/settings → Keywords
+```
+
+### How It Works
+
+<Tabs>
+  <Tab title="Deny List (Default)">
+    **Default Behavior:** Bot processes all messages
+    
+    **Your Control:** Block messages containing specific keywords
+    
+    **Default Keyword:** `fxignore`
+    
+    **Example:**
+    ```
+    Keywords: fxignore, nofix, skip
+    
+    "Check this out: https://twitter.com/..." → ✅ Processed
+    "fxignore https://twitter.com/..." → ❌ Blocked
+    "Please nofix this: https://twitter.com/..." → ❌ Blocked
+    ```
+  </Tab>
+  
+  <Tab title="Allow List (Premium)">
+    **Default Behavior:** Bot processes no messages
+    
+    **Your Control:** Only process messages with specific keywords
+    
+    **Example:**
+    ```
+    Keywords: fix, embed, show
+    
+    "Check this out: https://twitter.com/..." → ❌ Blocked
+    "fix https://twitter.com/..." → ✅ Processed
+    "Please embed this: https://twitter.com/..." → ✅ Processed
+    ```
+  </Tab>
+</Tabs>
+
+### Keyword Matching
+
+Keywords are matched using **word boundaries** (`\b` regex):
+
+<CodeGroup>
+```text Matches
+"fxignore" matches "fxignore"
+"fxignore" matches "fxignore this link"
+"fxignore" matches "this link fxignore"
+```
+
+```text Doesn't Match
+"fxignore" does NOT match "fxignored"
+"fxignore" does NOT match "nofxignore"
+"fxignore" does NOT match "fxignores"
+```
+</CodeGroup>
+
+<Tip>
+Keywords are case-sensitive by default. Consider adding variations if needed (e.g., both "fix" and "Fix").
+</Tip>
+
+### Managing Keywords
+
+<Steps>
+  <Step title="View current keywords">
+    The embed shows all configured keywords (max 25).
+  </Step>
+  
+  <Step title="Add a keyword">
+    1. Click **Add Keyword**
+    2. Enter the keyword (max 50 characters)
+    3. Click Submit
+  </Step>
+  
+  <Step title="Edit a keyword">
+    1. Select the keyword from the dropdown
+    2. Click **Edit Keyword**
+    3. Modify the text
+    4. Click Submit
+  </Step>
+  
+  <Step title="Delete a keyword">
+    1. Select the keyword from the dropdown
+    2. Click **Delete**
+  </Step>
+  
+  <Step title="Switch modes (Premium)">
+    Click **Toggle Mode** to switch between allow-list and deny-list.
+  </Step>
+</Steps>
+
+### Keyword Limits
+
+<CardGroup cols={2}>
+  <Card title="Free Tier" icon="lock">
+    **Maximum:** 3 keywords
+    
+    Default includes `fxignore`
+  </Card>
+  
+  <Card title="Premium" icon="crown">
+    **Maximum:** 25 keywords
+    
+    Plenty for complex filtering rules
+  </Card>
+</CardGroup>
+
+### Common Keyword Patterns
+
+<AccordionGroup>
+  <Accordion title="Ignore keyword (deny-list)">
+    **Keywords:** `fxignore`, `nofix`, `skip`
+    
+    **Use case:** Let users opt-out of embed fixing
+    
+    **Example:**
+    ```
+    fxignore Check out this tweet: https://twitter.com/...
+    ```
+  </Accordion>
+  
+  <Accordion title="Request-only mode (allow-list, Premium)">
+    **Mode:** Allow-list
+    
+    **Keywords:** `fix`, `embed`
+    
+    **Use case:** Only fix embeds when explicitly requested
+    
+    **Example:**
+    ```
+    Please fix https://twitter.com/...
+    embed this: https://instagram.com/...
+    ```
+  </Accordion>
+  
+  <Accordion title="Language-specific (allow-list, Premium)">
+    **Mode:** Allow-list
+    
+    **Keywords:** `翻訳`, `翻译`, `번역`
+    
+    **Use case:** Only fix when translation is requested
+    
+    **Example:**
+    ```
+    翻訳 https://twitter.com/...
+    ```
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Combining Filters
+
+All filters work together. A message must pass **every active filter** to be processed.
+
+### Example Configuration
+
+<Tabs>
+  <Tab title="Setup">
+    **Channel Filtering:**
+    - ❌ #off-topic (disabled)
+    
+    **Role Filtering:**
+    - ❌ @Muted (disabled)
+    
+    **Keyword Filtering:**
+    - Deny-list: `fxignore`
+  </Tab>
+  
+  <Tab title="Test Cases">
+    | Message | Channel | Role | Keywords | Result |
+    |---------|---------|------|----------|--------|
+    | `https://twitter.com/...` | #general | @Member | none | ✅ Processed |
+    | `https://twitter.com/...` | #off-topic | @Member | none | ❌ Blocked (channel) |
+    | `https://twitter.com/...` | #general | @Muted | none | ❌ Blocked (role) |
+    | `fxignore https://twitter.com/...` | #general | @Member | fxignore | ❌ Blocked (keyword) |
+    | `https://twitter.com/...` | #off-topic | @Muted | fxignore | ❌ Blocked (all filters!) |
+  </Tab>
+</Tabs>
+
+### Filter Priority
+
+Filters are checked in this order:
+
+<Steps>
+  <Step title="Keywords">
+    Message content is checked against keyword filters first.
+  </Step>
+  
+  <Step title="Channels">
+    The channel where the message was sent is checked.
+  </Step>
+  
+  <Step title="Members">
+    The message author is checked against member filters.
+  </Step>
+  
+  <Step title="Roles">
+    The author's roles are checked (with ANY/ALL rule applied).
+  </Step>
+  
+  <Step title="Webhooks">
+    If the message is from a webhook/bot, webhook settings are checked.
+  </Step>
+</Steps>
+
+<Info>
+This order is optimized for performance - cheaper checks happen first.
+</Info>
+
+---
+
+## Troubleshooting Filters
+
+### Bot Not Responding
+
+<AccordionGroup>
+  <Accordion title="Check Troubleshooting view">
+    1. Use `/settings` → Troubleshooting
+    2. Select the channel where the bot isn't working
+    3. Select the member who sent the message
+    4. Review the **Filters** section to see what's blocking it
+  </Accordion>
+  
+  <Accordion title="Verify channel permissions">
+    The **Permissions** section in Troubleshooting shows:
+    - ✅ Green check: Permission granted
+    - ❌ Red X: Permission missing
+    
+    Ensure all required permissions are green.
+  </Accordion>
+  
+  <Accordion title="Check each filter individually">
+    The Troubleshooting view shows the state of each filter:
+    
+    ```
+    - ✅ Channel #general is enabled
+    - ✅ Webhooks: not a webhook
+    - ✅ Member @user is enabled
+    - ✅ Role @Member is enabled
+    - ❌ Keyword "fxignore" found (deny-list)
+    ```
+    
+    Look for any ❌ to identify the blocking filter.
+  </Accordion>
+</AccordionGroup>
+
+### Bot Responding When It Shouldn't
+
+<AccordionGroup>
+  <Accordion title="Check deny-list configuration">
+    In deny-list mode, you must explicitly **disable** channels/roles/members.
+    
+    Ensure you've toggled off the items you want to block.
+  </Accordion>
+  
+  <Accordion title="Verify keyword matching">
+    Keywords use word boundaries. Check that your keyword matches exactly:
+    - `"fxignore"` won't match `"nofxignore"`
+    - Consider adding multiple variations if needed
+  </Accordion>
+  
+  <Accordion title="Check role matching rule">
+    If using allow-list with multiple roles:
+    - **ANY rule:** User needs one of the roles
+    - **ALL rule:** User needs all of the roles
+    
+    Verify the rule matches your intent.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Start Simple" icon="seedling">
+    Begin with default deny-list mode and only add filters as needed.
+  </Card>
+  
+  <Card title="Use Troubleshooting" icon="stethoscope">
+    Always check the Troubleshooting view to diagnose issues.
+  </Card>
+  
+  <Card title="Document Your Rules" icon="book">
+    Keep track of why you enabled/disabled specific filters.
+  </Card>
+  
+  <Card title="Test Thoroughly" icon="flask">
+    Test with different channels, roles, and users to verify behavior.
+  </Card>
+  
+  <Card title="Combine Wisely" icon="puzzle-piece">
+    Use multiple filters together for fine-grained control.
+  </Card>
+  
+  <Card title="Consider Premium" icon="crown">
+    Allow-list mode is powerful for restrictive filtering.
+  </Card>
+</CardGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Settings Overview" icon="sliders" href="/usage/settings">
+    Learn about all available settings
+  </Card>
+  
+  <Card title="Custom Websites" icon="globe" href="/usage/custom-websites">
+    Add support for additional websites
+  </Card>
+  
+  <Card title="Basic Usage" icon="play" href="/usage/basic-usage">
+    Learn the fundamentals
+  </Card>
+  
+  <Card title="Get Premium" icon="crown" href="/features/premium">
+    Unlock allow-list mode and extended limits
+  </Card>
+</CardGroup>

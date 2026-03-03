@@ -1,0 +1,240 @@
+---
+title: 'Premium Features'
+description: 'Unlock additional features with FixTweetBot Premium subscription'
+icon: 'crown'
+---
+
+Upgrade to FixTweetBot Premium to unlock exclusive features and support the continued development of the bot.
+
+## Premium Features
+
+<CardGroup cols={2}>
+  <Card title="Respond to Bots & Webhooks" icon="robot">
+    Enable FixTweetBot to fix links posted by other bots and webhooks, not just regular users.
+    
+    **Perfect for:**
+    - Servers with multiple bots
+    - RSS feeds and news bots
+    - Webhook integrations
+    - Automated posting systems
+  </Card>
+  
+  <Card title="Priority Support" icon="headset">
+    Get faster responses and dedicated support in the support server.
+    
+    **Includes:**
+    - Priority in support tickets
+    - Direct access to developers
+    - Faster bug fixes
+    - Feature request priority
+  </Card>
+  
+  <Card title="Support Development" icon="heart">
+    Help keep FixTweetBot running and continuously improving.
+    
+    **Your support enables:**
+    - Server infrastructure costs
+    - New feature development
+    - Bug fixes and improvements
+    - Ongoing maintenance
+  </Card>
+  
+  <Card title="Premium Badge" icon="badge-check">
+    Show your support with a special badge in bot interactions.
+    
+    **Display:**
+    - Premium indicator in settings
+    - Recognition in the community
+    - Support server perks
+  </Card>
+</CardGroup>
+
+## Bot & Webhook Response
+
+The standout premium feature is the ability to respond to messages from bots and webhooks.
+
+### How It Works
+
+<Steps>
+  <Step title="Enable in Settings">
+    After subscribing to Premium, enable the "Respond to bots/webhooks" option in `/settings`.
+  </Step>
+  
+  <Step title="Automatic Detection">
+    FixTweetBot will now process links from:
+    - Other Discord bots
+    - Webhook messages
+    - Automated posting systems
+  </Step>
+  
+  <Step title="Same Great Experience">
+    Links from bots are fixed the same way as user messages, with all your configured settings applied.
+  </Step>
+</Steps>
+
+### Use Cases
+
+<AccordionGroup>
+  <Accordion title="RSS Feed Bots" icon="rss">
+    Many servers use RSS bots to automatically post content from social media accounts. Premium allows FixTweetBot to fix these links automatically.
+    
+    **Example:** Twitter RSS bot posts new tweets → FixTweetBot fixes them instantly
+  </Accordion>
+  
+  <Accordion title="News & Update Bots" icon="newspaper">
+    News bots often share links to social media posts. With Premium, these are automatically enhanced.
+    
+    **Example:** Gaming news bot shares TikTok → FixTweetBot provides better embed
+  </Accordion>
+  
+  <Accordion title="Webhook Integrations" icon="webhook">
+    If you use webhooks to integrate external services, Premium ensures all links are fixed.
+    
+    **Example:** GitHub webhook shares Instagram link → FixTweetBot fixes it
+  </Accordion>
+  
+  <Accordion title="Multi-Bot Servers" icon="bots">
+    Servers with multiple bots benefit from seamless link fixing across all bot messages.
+    
+    **Example:** Any bot posts social media link → FixTweetBot handles it
+  </Accordion>
+</AccordionGroup>
+
+### Configuration
+
+The bot/webhook response feature is configured in the Guild model:
+
+```python
+__casts__ = {
+    'webhooks': bool,
+    # ... other settings
+}
+```
+
+This setting determines whether the bot processes messages from non-user sources.
+
+## Getting Premium
+
+<Card title="Subscribe to Premium" icon="shopping-cart" href="https://discord.com/application-directory/1164651057243238400/store/1260699263755751456">
+  Purchase FixTweetBot Premium through the Discord App Directory.
+  
+  **Visit:** [Discord App Directory Store](https://discord.com/application-directory/1164651057243238400/store/1260699263755751456)
+</Card>
+
+### Pricing
+
+Premium is available as a Discord subscription through the App Directory. Pricing details are available on the store page.
+
+<Note>
+Premium features are applied server-wide. One subscription covers all features for your entire Discord server.
+</Note>
+
+## Alternative: GitHub Sponsors
+
+You can also support FixTweetBot development through GitHub Sponsors:
+
+<Card title="GitHub Sponsors" icon="github" href="https://github.com/sponsors/Kyrela">
+  Sponsor the developer on GitHub to support the project.
+  
+  **Benefits:**
+  - Support open-source development
+  - Recognition in README
+  - Special rewards based on tier
+  - Help keep the bot free for everyone
+  
+  **Visit:** [github.com/sponsors/Kyrela](https://github.com/sponsors/Kyrela)
+</Card>
+
+### Sponsor Tiers
+
+GitHub Sponsors offers various tiers with different rewards:
+
+- Your name displayed in the README
+- Early access to new features
+- Direct communication with the developer
+- Custom recognition in the community
+
+<Info>
+GitHub Sponsors donations help fund the project but may not include the same server-specific features as Discord Premium. Check the sponsor tier details for specific benefits.
+</Info>
+
+## Free Features
+
+FixTweetBot remains free to use with extensive features:
+
+- Fix links from 30+ platforms
+- Customizable embed views
+- Multi-language support
+- Advanced filtering rules
+- Channel/role/member exceptions
+- Keyword filtering
+- Custom websites
+- And much more!
+
+<Note>
+The core functionality of FixTweetBot is free. Premium simply unlocks additional features and helps support development.
+</Note>
+
+## Premium FAQ
+
+<AccordionGroup>
+  <Accordion title="Is Premium required to use the bot?">
+    No, FixTweetBot is free to use with all core features available. Premium only adds the ability to respond to bots/webhooks and provides priority support.
+  </Accordion>
+  
+  <Accordion title="Can I try Premium before buying?">
+    Unfortunately, there's no free trial available. However, the Premium feature set is clearly defined, and you can see exactly what you're getting before subscribing.
+  </Accordion>
+  
+  <Accordion title="What happens if I cancel Premium?">
+    If you cancel your Premium subscription:
+    - The bot will stop responding to bots and webhooks
+    - All other features continue to work normally
+    - Your server settings are preserved
+    - You can resubscribe at any time
+  </Accordion>
+  
+  <Accordion title="Can I gift Premium to another server?">
+    Currently, Premium subscriptions are tied to the purchasing server. Contact support if you need special arrangements.
+  </Accordion>
+  
+  <Accordion title="How do I manage my subscription?">
+    Premium subscriptions are managed through Discord's subscription system. Visit your server settings → Subscriptions to manage your FixTweetBot Premium.
+  </Accordion>
+  
+  <Accordion title="Do I get a refund if I'm not satisfied?">
+    Refunds are handled by Discord's subscription system. Check Discord's refund policy for details.
+  </Accordion>
+</AccordionGroup>
+
+## Support the Project
+
+There are multiple ways to support FixTweetBot:
+
+<CardGroup cols={2}>
+  <Card title="Subscribe to Premium" icon="crown" href="https://discord.com/application-directory/1164651057243238400/store/1260699263755751456">
+    Get Premium features and support the bot
+  </Card>
+  
+  <Card title="GitHub Sponsors" icon="github" href="https://github.com/sponsors/Kyrela">
+    Sponsor the developer on GitHub
+  </Card>
+  
+  <Card title="Leave a Review" icon="star" href="https://top.gg/bot/1164651057243238400">
+    Review the bot on Top.gg and other platforms
+  </Card>
+  
+  <Card title="Contribute Code" icon="code" href="https://github.com/Kyrela/FixTweetBot">
+    Contribute to the open-source project
+  </Card>
+</CardGroup>
+
+## Questions?
+
+If you have questions about Premium features or subscriptions:
+
+- Join the [Support Server](https://discord.gg/3ej9JrkF3U)
+- Open an issue on [GitHub](https://github.com/Kyrela/FixTweetBot)
+- Check the [FAQ section](/faq)
+
+Thank you for supporting FixTweetBot!

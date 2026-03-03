@@ -1,0 +1,488 @@
+---
+title: Settings Command
+description: Complete guide to the /settings command and all configuration options
+icon: sliders
+---
+
+## Overview
+
+The `/settings` command provides a comprehensive interface to configure FixTweetBot for your Discord server. All settings are managed through an interactive menu with buttons, dropdowns, and modals.
+
+<Note>
+You need the **Manage Messages** permission to use the `/settings` command.
+</Note>
+
+## Accessing Settings
+
+<Steps>
+  <Step title="Open the command menu">
+    Type `/settings` in any channel where the bot is present.
+  </Step>
+  
+  <Step title="Navigate the menu">
+    Use the dropdown at the bottom to select a settings category.
+  </Step>
+  
+  <Step title="Adjust settings">
+    Use the buttons and dropdowns that appear for each category to modify settings.
+  </Step>
+  
+  <Step title="Changes save automatically">
+    All changes are saved instantly to the database. No need to click "Save".
+  </Step>
+</Steps>
+
+<Tip>
+The settings interface automatically closes after 3 minutes of inactivity. Simply run `/settings` again to continue configuring.
+</Tip>
+
+## Settings Categories
+
+### Troubleshooting
+
+
+Diagnose issues and view your current configuration at a glance.
+
+**Features:**
+- **Ping**: View the bot's current latency
+- **Permissions**: Check if the bot has required permissions in the current channel
+- **Filters**: See all active filters (channels, roles, members, keywords)
+- **Websites**: View which websites are enabled/disabled
+- **Custom Websites**: List all custom websites configured
+- **Premium Status**: Check if your server has premium features
+
+**Interactive Elements:**
+- **Refresh**: Update the troubleshooting view with current data
+- **Support**: Link to the support server
+- **Channel Selector**: Switch to a different channel to check its settings
+- **Member Selector**: Switch to a different member to check their settings
+
+<Info>
+Use this first when diagnosing why the bot isn't responding to certain messages.
+</Info>
+
+---
+
+### Channel Filtering
+
+Control which channels the bot responds in.
+
+<Tabs>
+  <Tab title="Settings">
+    **Current Channel State**: Shows if the bot is enabled/disabled in the selected channel
+    
+    **Buttons:**
+    - **Toggle**: Enable or disable the bot in the current channel
+    - **Toggle Default**: Switch between allow-list and deny-list mode (Premium)
+    - **Reset**: Clear all channel filters
+    
+    **Channel Selector**: Pick any channel to view/modify its settings
+  </Tab>
+  
+  <Tab title="Allow vs Deny List">
+    <AccordionGroup>
+      <Accordion title="Deny List (Default)">
+        - Bot works in **all channels by default**
+        - Manually **disable** specific channels
+        - Best for: Most servers
+        
+        Example: Disable bot in #general and #off-topic
+      </Accordion>
+      
+      <Accordion title="Allow List (Premium)">
+        - Bot works in **no channels by default**
+        - Manually **enable** specific channels
+        - Best for: Limiting bot to specific channels
+        
+        Example: Only enable bot in #media and #links
+      </Accordion>
+    </AccordionGroup>
+  </Tab>
+</Tabs>
+
+**Required Permissions:**
+- View Channel
+- Send Messages
+- Embed Links
+- Send Messages in Threads (for thread channels)
+
+<Warning>
+If the bot lacks required permissions, it will show a warning (⚠️) in the settings dropdown.
+</Warning>
+
+---
+
+### Member Filtering
+
+Control which members' messages the bot responds to.
+
+**Current Member State**: Shows if the bot is enabled/disabled for the selected member
+
+**Buttons:**
+- **Toggle**: Enable or disable the bot for the current member
+- **Toggle Default**: Switch between allow-list and deny-list mode (Premium)
+- **Reset**: Clear all member filters
+
+**Member Selector**: Pick any member to view/modify their settings
+
+<Tabs>
+  <Tab title="Deny List (Default)">
+    - Bot responds to **all members by default**
+    - Block specific members from using the bot
+    
+    Example: Block @SpamBot from triggering embeds
+  </Tab>
+  
+  <Tab title="Allow List (Premium)">
+    - Bot responds to **no members by default**
+    - Only allow specific members to use the bot
+    
+    Example: Only allow @Moderator and @Admin to use the bot
+  </Tab>
+</Tabs>
+
+<Info>
+Responding to bot/webhook messages requires the [Webhooks setting](#webhooks-setting) to be enabled (Premium for bots).
+</Info>
+
+---
+
+### Role Filtering
+
+Control which roles can trigger the bot.
+
+**Current Role State**: Shows if the bot is enabled/disabled for the selected role
+
+**Buttons:**
+- **Toggle**: Enable or disable the bot for the current role
+- **Toggle Default**: Switch between allow-list and deny-list mode (Premium)
+- **Toggle Rule**: Switch between ANY and ALL role matching (Premium)
+- **Reset**: Clear all role filters
+
+**Role Selector**: Pick any role to view/modify its settings
+
+<Tabs>
+  <Tab title="Deny List (Default)">
+    - Bot responds to **all roles by default**
+    - Block specific roles from using the bot
+    
+    Example: Block @Muted role from triggering embeds
+  </Tab>
+  
+  <Tab title="Allow List (Premium)">
+    - Bot responds to **no roles by default**
+    - Only allow specific roles to use the bot
+    
+    Example: Only allow @Members and @VIP to use the bot
+  </Tab>
+</Tabs>
+
+#### Role Matching Rules (Premium)
+
+<CardGroup cols={2}>
+  <Card title="ALL Rule (Default)" icon="check-double">
+    User must match **all** role filters to trigger the bot.
+    
+    If you enable @Members and @Active, users need **both** roles.
+  </Card>
+  
+  <Card title="ANY Rule" icon="check">
+    User must match **any** role filter to trigger the bot.
+    
+    If you enable @Members and @Active, users need **either** role.
+  </Card>
+</CardGroup>
+
+---
+
+### Keyword Filtering
+
+Filter messages based on keywords in the message content.
+
+**Keyword List**: Shows all configured keywords (up to 25)
+
+**Buttons:**
+- **Add Keyword**: Add a new keyword (max 50 characters)
+- **Edit Keyword**: Modify the selected keyword
+- **Delete Keyword**: Remove the selected keyword
+- **Toggle Mode**: Switch between allow-list and deny-list (Premium)
+
+**Dropdown**: Select a keyword to edit or delete
+
+<Tabs>
+  <Tab title="Deny List (Default)">
+    Messages **containing** these keywords will **NOT** be processed.
+    
+    **Default keyword:** `fxignore`
+    
+    Example keywords:
+    - `fxignore`
+    - `nofix`
+    - `skip`
+    
+    Use case: Let users opt-out of fixing with a keyword
+  </Tab>
+  
+  <Tab title="Allow List (Premium)">
+    **Only** messages containing these keywords will be processed.
+    
+    Example keywords:
+    - `fix`
+    - `embed`
+    
+    Use case: Bot only responds when explicitly requested
+  </Tab>
+</Tabs>
+
+<Note>
+Keyword matching uses word boundaries (`\b`), so "fxignore" won't match "fxignored" or "nofxignore".
+</Note>
+
+**Limits:**
+- Free: 3 keywords
+- Premium: 25 keywords
+
+---
+
+### Website Settings
+
+Enable/disable specific websites and configure embed views.
+
+**Dropdown**: Select a website to configure (Twitter, Instagram, TikTok, Reddit, etc.)
+
+#### Per-Website Settings
+
+<Tabs>
+  <Tab title="Basic Settings">
+    **Enable/Disable Button**: Toggle the website on or off
+    
+    Example: Disable Instagram embeds while keeping Twitter enabled
+  </Tab>
+  
+  <Tab title="View Modes">
+    Many websites support different embed views:
+    
+    <AccordionGroup>
+      <Accordion title="Normal View">
+        Standard embed with text, media preview, and metadata.
+      </Accordion>
+      
+      <Accordion title="Direct Media">
+        Embed shows media directly without extra text or metadata.
+        
+        Best for: Quick media viewing
+      </Accordion>
+      
+      <Accordion title="Gallery View">
+        Shows all images in a post as a gallery.
+        
+        Best for: Posts with multiple images
+      </Accordion>
+      
+      <Accordion title="Text Only">
+        Shows only the text content without media.
+        
+        Best for: Twitter threads
+      </Accordion>
+    </AccordionGroup>
+    
+    **Available for:** Twitter, Instagram, TikTok, Bluesky, Snapchat, and more
+  </Tab>
+  
+  <Tab title="Translation">
+    **Enable Translation**: Translate posts to a target language
+    
+    **Select Language**: Choose your target language (2-letter code)
+    
+    **Available for:** Twitter, and other supported platforms
+    
+    Example: Translate Japanese tweets to English (`en`)
+  </Tab>
+</Tabs>
+
+**Supported Websites Include:**
+- Twitter/X (FxTwitter)
+- Instagram (InstaFix)
+- TikTok (fxTikTok)
+- Reddit (vxreddit)
+- Threads (FixThreads)
+- Bluesky (VixBluesky)
+- And [many more](/features/supported-platforms)!
+
+---
+
+### Original Message Behavior
+
+Choose what happens to the original message after the bot posts the fixed embed.
+
+<Tabs>
+  <Tab title="Remove Embeds (Default)">
+    ✂️ **Remove Embeds**
+    
+    - Keeps the original message
+    - Removes the embed to avoid duplication
+    - Requires: `Manage Messages` permission
+  </Tab>
+  
+  <Tab title="Delete Message">
+    🗑️ **Delete Message**
+    
+    - Completely removes the original message
+    - Only the fixed embed remains
+    - Requires: `Manage Messages` permission
+    
+    <Warning>
+    This permanently deletes user messages. Use with caution.
+    </Warning>
+  </Tab>
+  
+  <Tab title="Do Nothing">
+    ⭕ **Do Nothing**
+    
+    - Leaves the original message unchanged
+    - Both original and fixed embeds are visible
+    - No special permissions required
+  </Tab>
+</Tabs>
+
+**Dropdown**: Select your preferred behavior
+
+---
+
+### Reply Method
+
+Configure how the bot posts its responses.
+
+**Buttons:**
+- **Reply to Message**: Toggle whether the bot replies to the original message
+- **Silent Messages**: Toggle whether messages are sent silently (no notifications)
+
+<CardGroup cols={2}>
+  <Card title="Reply Mode" icon="reply">
+    **Enabled (Default):**
+    - Bot replies to the original message
+    - Creates a threaded conversation
+    - Requires: `Read Message History`
+    
+    **Disabled:**
+    - Bot sends a regular message
+    - No threading
+  </Card>
+  
+  <Card title="Silent Mode" icon="bell-slash">
+    **Enabled:**
+    - Messages don't trigger notifications
+    - Useful for busy channels
+    
+    **Disabled (Default):**
+    - Normal notification behavior
+  </Card>
+</CardGroup>
+
+---
+
+### Webhooks Setting
+
+Allow the bot to respond to messages from webhooks and other bots.
+
+**Toggle Button**: Enable or disable webhook support
+
+<Tabs>
+  <Tab title="Enabled">
+    ✅ **Webhooks Enabled**
+    
+    - Bot responds to webhook messages
+    - Bot responds to other bot messages (Premium required)
+    - Useful for: Integration with other services
+  </Tab>
+  
+  <Tab title="Disabled (Default)">
+    ❌ **Webhooks Disabled**
+    
+    - Bot ignores webhook messages
+    - Bot ignores other bot messages
+    - Best for: Normal user-only operation
+  </Tab>
+</Tabs>
+
+<Info>
+This is a **premium feature** for responding to non-webhook bot messages.
+</Info>
+
+---
+
+## Premium Features
+
+The following settings require [Premium](/premium):
+
+<CardGroup cols={2}>
+  <Card title="Advanced Filtering" icon="filter">
+    - Allow-list mode for channels, roles, members
+    - Role matching rules (ANY vs ALL)
+    - Extended keyword limits (25 vs 3)
+  </Card>
+  
+  <Card title="Translation" icon="language">
+    - Translate posts to any language
+    - Available on supported websites
+  </Card>
+  
+  <Card title="Bot Responses" icon="robot">
+    - Respond to other bot messages
+    - Webhook support included
+  </Card>
+  
+  <Card title="Extended Limits" icon="arrow-up">
+    - More keywords (25 vs 3)
+    - More custom websites (25 vs 3)
+  </Card>
+</CardGroup>
+
+## Tips & Best Practices
+
+<AccordionGroup>
+  <Accordion title="Start with Troubleshooting">
+    Always check the Troubleshooting tab first to see your current configuration and diagnose issues.
+  </Accordion>
+  
+  <Accordion title="Use Channel Filtering Wisely">
+    Instead of disabling many channels, consider using allow-list mode (Premium) to only enable specific channels.
+  </Accordion>
+  
+  <Accordion title="Combine Filters">
+    You can combine multiple filters:
+    - Block #off-topic channel
+    - Block @Muted role
+    - Add "fxignore" keyword
+    
+    All filters must pass for the bot to respond.
+  </Accordion>
+  
+  <Accordion title="Test Your Settings">
+    After configuring, test by sending a link in different channels/with different roles to ensure it works as expected.
+  </Accordion>
+  
+  <Accordion title="Permissions Matter">
+    If settings show a ⚠️ warning, check that the bot has the required permissions in that channel.
+  </Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Learn About Filtering" icon="filter" href="/usage/filtering">
+    Deep dive into channel, role, member, and keyword filtering
+  </Card>
+  
+  <Card title="Add Custom Websites" icon="globe" href="/usage/custom-websites">
+    Configure custom embedding services
+  </Card>
+  
+  <Card title="Basic Usage" icon="play" href="/usage/basic-usage">
+    Learn the fundamentals of using the bot
+  </Card>
+  
+  <Card title="Get Premium" icon="crown" href="/features/premium">
+    Unlock advanced features
+  </Card>
+</CardGroup>

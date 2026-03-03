@@ -1,0 +1,248 @@
+---
+title: 'Embed View Modes'
+description: 'Different embed display modes for various platforms'
+icon: 'eye'
+---
+
+FixTweetBot offers different embed view modes for supported platforms, allowing you to customize how content is displayed in Discord.
+
+## Available View Modes
+
+<Tabs>
+  <Tab title="Normal View">
+    The default embed view that displays content with standard Discord embed formatting.
+    
+    **Features:**
+    - Complete embed with metadata
+    - Author information
+    - Post description/caption
+    - Media thumbnails
+    - Best for most use cases
+    
+    **Supported Platforms:**
+    - Twitter/X (`TwitterView.NORMAL`)
+    - Instagram (`InstagramView.NORMAL`)
+    - TikTok (`TiktokView.NORMAL`)
+    - Bluesky (`BlueskyView.NORMAL`)
+    - Snapchat (`EmbedEzView.NORMAL`)
+    - IFunny (`EmbedEzView.NORMAL`)
+    - Imgur (`EmbedEzView.NORMAL`)
+    - Weibo (`EmbedEzView.NORMAL`)
+    - Imageboards (`EmbedEzView.NORMAL`)
+    - Pinterest (`EmbedEzView.NORMAL`)
+  </Tab>
+
+  <Tab title="Direct Media">
+    Displays media directly without additional embed formatting, perfect for quick viewing.
+    
+    **Features:**
+    - Direct video/image display
+    - Minimal metadata
+    - Faster loading
+    - No embed wrapper
+    - Best for media-focused content
+    
+    **Supported Platforms:**
+    - Twitter/X (`TwitterView.DIRECT_MEDIA`)
+    - Instagram (`InstagramView.DIRECT_MEDIA`)
+    - TikTok (`TiktokView.DIRECT_MEDIA`)
+    - Bluesky (`BlueskyView.DIRECT_MEDIA`)
+    - Snapchat (`EmbedEzView.DIRECT_MEDIA`)
+    - IFunny (`EmbedEzView.DIRECT_MEDIA`)
+    - Imgur (`EmbedEzView.DIRECT_MEDIA`)
+    - Weibo (`EmbedEzView.DIRECT_MEDIA`)
+    - Imageboards (`EmbedEzView.DIRECT_MEDIA`)
+    - Pinterest (`EmbedEzView.DIRECT_MEDIA`)
+  </Tab>
+
+  <Tab title="Gallery View">
+    Optimized view for posts with multiple images or media items.
+    
+    **Features:**
+    - Multiple media items displayed together
+    - Gallery-style layout
+    - Easy navigation between items
+    - Best for multi-image posts
+    
+    **Supported Platforms:**
+    - Twitter/X (`TwitterView.GALLERY`)
+    - Instagram (`InstagramView.GALLERY`)
+    - TikTok (`TiktokView.GALLERY`)
+    - Bluesky (`BlueskyView.GALLERY`)
+  </Tab>
+
+  <Tab title="Text Only">
+    Displays only the text content without media embeds.
+    
+    **Features:**
+    - Text content only
+    - No media preview
+    - Lightweight display
+    - Best for text-focused posts
+    
+    **Supported Platforms:**
+    - Twitter/X (`TwitterView.TEXT_ONLY`)
+  </Tab>
+</Tabs>
+
+## Platform-Specific View Modes
+
+### Twitter/X
+
+Twitter supports all four view modes, defined in `database/models/Guild.py:29-33`:
+
+```python
+class TwitterView(GettableEnum):
+    NORMAL = 'normal'
+    GALLERY = 'gallery'
+    TEXT_ONLY = 'text_only'
+    DIRECT_MEDIA = 'direct_media'
+```
+
+Subdomain mapping in `src/websites.py:373-378`:
+- Normal: (no subdomain)
+- Gallery: `g.fxtwitter.com`
+- Text Only: `t.fxtwitter.com`
+- Direct Media: `d.fxtwitter.com`
+
+### Instagram
+
+Instagram supports three view modes, defined in `database/models/Guild.py:35-38`:
+
+```python
+class InstagramView(GettableEnum):
+    NORMAL = 'normal'
+    DIRECT_MEDIA = 'direct_media'
+    GALLERY = 'gallery'
+```
+
+URL parameter mapping in `src/websites.py:403-406`:
+- Normal: (no parameter)
+- Direct Media: `?direct=true`
+- Gallery: `?gallery=true`
+
+### TikTok
+
+TikTok supports three view modes, defined in `database/models/Guild.py:40-43`:
+
+```python
+class TiktokView(GettableEnum):
+    NORMAL = 'normal'
+    GALLERY = 'gallery'
+    DIRECT_MEDIA = 'direct_media'
+```
+
+Subdomain mapping in `src/websites.py:424-428`:
+- Normal: `a.tnktok.com`
+- Gallery: `tnktok.com`
+- Direct Media: `d.tnktok.com`
+
+### Bluesky
+
+Bluesky supports three view modes, defined in `database/models/Guild.py:45-48`:
+
+```python
+class BlueskyView(GettableEnum):
+    NORMAL = 'normal'
+    DIRECT_MEDIA = 'direct_media'
+    GALLERY = 'gallery'
+```
+
+Subdomain mapping in `src/websites.py:475-479`:
+- Normal: (no subdomain)
+- Direct Media: `r.bskx.app`
+- Gallery: `g.bskx.app`
+
+### EmbedEZ Platforms
+
+Several platforms use EmbedEZ with two view modes, defined in `database/models/Guild.py:50-52`:
+
+```python
+class EmbedEzView(GettableEnum):
+    NORMAL = 'normal'
+    DIRECT_MEDIA = 'direct_media'
+```
+
+Subdomain mapping in `src/websites.py:339-342`:
+- Normal: (no subdomain)
+- Direct Media: `d.` subdomain
+
+**Platforms using EmbedEzView:**
+- Snapchat
+- IFunny
+- Imgur
+- Weibo
+- Imageboards (Rule34.xxx, Gelbooru, Danbooru, etc.)
+- Pinterest
+
+## Configuring View Modes
+
+View modes are configured per-platform through the bot's settings:
+
+1. Use the `/settings` command in your Discord server
+2. Navigate to the platform you want to configure
+3. Select your preferred view mode
+4. The bot will use this view mode for all future embeds from that platform
+
+<Note>
+View mode settings are server-specific. Each server can have its own preferred view modes.
+</Note>
+
+## Implementation Details
+
+View modes are implemented in the `Guild` model with specific enum casts:
+
+```python
+__casts__ = {
+    'twitter_view': TwitterView,
+    'tiktok_view': TiktokView,
+    'bluesky_view': BlueskyView,
+    'instagram_view': InstagramView,
+    'snapchat_view': EmbedEzView,
+    'ifunny_view': EmbedEzView,
+    'imgur_view': EmbedEzView,
+    'weibo_view': EmbedEzView,
+    'imageboards_view': EmbedEzView,
+    'pinterest_view': EmbedEzView,
+}
+```
+
+The bot uses these settings to modify the fixer URL accordingly, either through:
+- Subdomain prefixes (e.g., `d.fxtwitter.com`)
+- URL parameters (e.g., `?direct=true`)
+- Different base domains
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="When to use Normal View">
+    Use Normal view when you want:
+    - Complete context about the post
+    - Author information visible
+    - Standard Discord embed experience
+    - Best compatibility with Discord's features
+  </Accordion>
+
+  <Accordion title="When to use Direct Media">
+    Use Direct Media when you want:
+    - Fast, immediate media viewing
+    - Minimal clutter
+    - Videos to auto-play in Discord
+    - Mobile-friendly viewing
+  </Accordion>
+
+  <Accordion title="When to use Gallery View">
+    Use Gallery view when:
+    - Posts frequently contain multiple images
+    - You want easy navigation between media items
+    - Your community shares a lot of photo posts
+  </Accordion>
+
+  <Accordion title="When to use Text Only">
+    Use Text Only when:
+    - You're in a text-focused community
+    - Media previews cause issues
+    - You want to reduce bandwidth usage
+    - Reading content is more important than viewing media
+  </Accordion>
+</AccordionGroup>

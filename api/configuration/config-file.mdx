@@ -1,0 +1,273 @@
+---
+title: 'Configuration Files'
+description: 'Reference for config.yml and override.config.yml files'
+---
+
+FixTweetBot uses YAML configuration files to customize its behavior. The default configuration is in `config.yml`, and you can override any setting using `override.config.yml`.
+
+## Configuration Files
+
+### config.yml
+
+The main configuration file containing all default settings. This file is included in the bot repository and should not be modified directly.
+
+### override.config.yml
+
+An optional configuration file that overrides default values from `config.yml`. This is the recommended way to customize your bot instance.
+
+<Info>
+You only need to specify settings in `override.config.yml` that you want to change from their defaults. All other values will be inherited from `config.yml`.
+</Info>
+
+## Example Override Configuration
+
+```yaml
+token: <your_personal_token>
+dev_guild: <your_personnal_guild_id> # optional, for dev commands
+
+database:
+  host: <your_database_host>
+  driver: <your_database_driver> # (e.g., mysql for MySQL/MariaDB)
+  database: <your_database_name>
+  user: <your_database_user>
+  password: <your_database_password>
+  port: <your_database_port>
+```
+
+## Configuration Options
+
+### Basic Settings
+
+<ParamField path="description" type="string" default="This bot automatically repost x.com and twitter.com posts as fxtwitter ones.">
+  Bot description text.
+</ParamField>
+
+<ParamField path="version" type="string" default="3.3.6">
+  Bot version number.
+</ParamField>
+
+<ParamField path="color" type="integer" default="0x1d9bf0">
+  Default embed color in hexadecimal format. The default value `0x1d9bf0` is Twitter's brand blue color.
+</ParamField>
+
+<ParamField path="hot_reload" type="boolean" default="false">
+  Enable hot reloading of configuration changes without restarting the bot.
+</ParamField>
+
+<ParamField path="about_command" type="boolean" default="true">
+  Enable the `/about` command for users to get information about the bot.
+</ParamField>
+
+<ParamField path="analytic" type="boolean" default="true">
+  Enable analytics tracking for bot usage statistics.
+</ParamField>
+
+### Link Settings
+
+<ParamField path="invite_link" type="string" default="https://discord.com/oauth2/authorize?client_id={id}">
+  Bot invite link template. The `{id}` placeholder is replaced with the bot's client ID.
+</ParamField>
+
+<ParamField path="repo_link" type="string" default="https://github.com/Kyrela/FixTweetBot">
+  Link to the bot's GitHub repository.
+</ParamField>
+
+<ParamField path="support_link" type="string" default="https://discord.gg/3ej9JrkF3U">
+  Discord invite link for the bot's support server.
+</ParamField>
+
+### Log Settings
+
+<ParamField path="log.file" type="string" default="log.txt">
+  Path to the log file where bot logs are written.
+</ParamField>
+
+<ParamField path="log.alert_user" type="boolean" default="false">
+  Whether to send alerts to users when errors occur.
+</ParamField>
+
+<ParamField path="log.stream_to_err" type="boolean" default="false">
+  Whether to stream logs to stderr in addition to the log file.
+</ParamField>
+
+<ParamField path="log.date_format" type="string" default="%d/%m/%Y %H:%M:%S">
+  Date format for log timestamps using Python's strftime format.
+</ParamField>
+
+<ParamField path="log.format" type="string" default="[{asctime}] {levelformat} {name:<20} {message}">
+  Log message format template. Available placeholders: `{asctime}`, `{levelformat}`, `{name}`, `{message}`.
+</ParamField>
+
+### Database Settings
+
+<ParamField path="database.connection_pooling_enabled" type="boolean" default="true">
+  Enable connection pooling to improve database performance.
+</ParamField>
+
+<ParamField path="database.connection_pooling_min_size" type="integer" default="2">
+  Minimum number of database connections to maintain in the pool.
+</ParamField>
+
+<ParamField path="database.connection_pooling_max_size" type="integer" default="10">
+  Maximum number of database connections allowed in the pool.
+</ParamField>
+
+<ParamField path="database.host" type="string">
+  Database server hostname or IP address. Set via environment variable or override config.
+</ParamField>
+
+<ParamField path="database.port" type="integer">
+  Database server port. Set via environment variable or override config.
+</ParamField>
+
+<ParamField path="database.driver" type="string" default="mysql">
+  Database driver to use. Supported values: `mysql` (MySQL/MariaDB), `postgres`, `mssql`, `sqlite`.
+</ParamField>
+
+<ParamField path="database.database" type="string">
+  Name of the database to connect to. Set via environment variable or override config.
+</ParamField>
+
+<ParamField path="database.user" type="string">
+  Database user for authentication. Set via environment variable or override config.
+</ParamField>
+
+<ParamField path="database.password" type="string">
+  Database password for authentication. Set via environment variable or override config.
+</ParamField>
+
+### Emoji Settings
+
+Customize emojis used throughout the bot interface:
+
+<ParamField path="emoji.github" type="string" default="🖥️">
+  Emoji for GitHub-related features.
+</ParamField>
+
+<ParamField path="emoji.add" type="string" default="➕">
+  Emoji for add/create actions.
+</ParamField>
+
+<ParamField path="emoji.discord" type="string" default="💬">
+  Emoji for Discord-related features.
+</ParamField>
+
+<ParamField path="emoji.twitter" type="string" default="🐦">
+  Emoji for Twitter/X links.
+</ParamField>
+
+<ParamField path="emoji.instagram" type="string" default="📸">
+  Emoji for Instagram links.
+</ParamField>
+
+<ParamField path="emoji.tiktok" type="string" default="🎶">
+  Emoji for TikTok links.
+</ParamField>
+
+<ParamField path="emoji.reddit" type="string" default="🤖">
+  Emoji for Reddit links.
+</ParamField>
+
+<ParamField path="emoji.threads" type="string" default="🧵">
+  Emoji for Threads links.
+</ParamField>
+
+<ParamField path="emoji.snapchat" type="string" default="👻">
+  Emoji for Snapchat links.
+</ParamField>
+
+<ParamField path="emoji.facebook" type="string" default="📘">
+  Emoji for Facebook links.
+</ParamField>
+
+<ParamField path="emoji.pinterest" type="string" default="📌">
+  Emoji for Pinterest links.
+</ParamField>
+
+<ParamField path="emoji.bluesky" type="string" default="🦋">
+  Emoji for Bluesky links.
+</ParamField>
+
+<ParamField path="emoji.pixiv" type="string" default="🖼️">
+  Emoji for Pixiv links.
+</ParamField>
+
+<ParamField path="emoji.mastodon" type="string" default="🐘">
+  Emoji for Mastodon links.
+</ParamField>
+
+<ParamField path="emoji.tumblr" type="string" default="📝">
+  Emoji for Tumblr links.
+</ParamField>
+
+<ParamField path="emoji.deviantart" type="string" default="🎨">
+  Emoji for DeviantArt links.
+</ParamField>
+
+<ParamField path="emoji.newgrounds" type="string" default="🚚">
+  Emoji for Newgrounds links.
+</ParamField>
+
+<ParamField path="emoji.twitch" type="string" default="🎮">
+  Emoji for Twitch links.
+</ParamField>
+
+<ParamField path="emoji.spotify" type="string" default="🎵">
+  Emoji for Spotify links.
+</ParamField>
+
+<ParamField path="emoji.bilibili" type="string" default="📺">
+  Emoji for Bilibili links.
+</ParamField>
+
+<ParamField path="emoji.ifunny" type="string" default="🙂">
+  Emoji for iFunny links.
+</ParamField>
+
+<ParamField path="emoji.furaffinity" type="string" default="🐾">
+  Emoji for Fur Affinity links.
+</ParamField>
+
+<ParamField path="emoji.youtube" type="string" default="📺">
+  Emoji for YouTube links.
+</ParamField>
+
+<ParamField path="emoji.imgur" type="string" default="🖼️">
+  Emoji for Imgur links.
+</ParamField>
+
+<ParamField path="emoji.weibo" type="string" default="👁️">
+  Emoji for Weibo links.
+</ParamField>
+
+<ParamField path="emoji.imageboards" type="string" default="🖼️">
+  Emoji for imageboard links (Rule34, Danbooru, Gelbooru, e621, etc.).
+</ParamField>
+
+<ParamField path="emoji.reply" type="string" default="↩️">
+  Emoji for reply actions.
+</ParamField>
+
+<ParamField path="emoji.webhooks" type="string" default="🔄">
+  Emoji for webhook-related features.
+</ParamField>
+
+<ParamField path="emoji.x" type="string" default="❎">
+  Emoji for close/cancel actions.
+</ParamField>
+
+<ParamField path="emoji.fixtweet" type="string" default="🤖">
+  Emoji for FixTweet-related features.
+</ParamField>
+
+<ParamField path="emoji.role" type="string" default="🎭">
+  Emoji for role-related features.
+</ParamField>
+
+## Docker Configuration
+
+When using Docker, you typically don't need an `override.config.yml` file. Instead, configuration is provided through environment variables in your `docker-compose.yml` file.
+
+<Note>
+See the [Environment Variables](/api/configuration/environment-variables) page for detailed information on configuring the bot via environment variables.
+</Note>

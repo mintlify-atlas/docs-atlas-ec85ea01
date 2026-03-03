@@ -1,0 +1,201 @@
+---
+title: Frequently Asked Questions
+description: Common questions and answers about using FixTweetBot
+---
+
+Find answers to the most frequently asked questions about FixTweetBot.
+
+## General Questions
+
+<AccordionGroup>
+  <Accordion title="What is FixTweetBot?">
+    FixTweetBot is a Discord bot that automatically fixes social media embeds by reposting links with better embed support. It uses online services like FxTwitter to provide enhanced embeds that allow videos to play directly in Discord, display image galleries, and more.
+  </Accordion>
+
+  <Accordion title="How does the bot work?">
+    When you send a message containing a supported social media link, the bot automatically detects it and reposts the link using a fixing service (like fxtwitter.com for Twitter links). This provides a better embed experience without requiring any manual action from you.
+  </Accordion>
+
+  <Accordion title="Is FixTweetBot free to use?">
+    Yes! The core functionality of FixTweetBot is completely free. There's also a [premium version](https://discord.com/application-directory/1164651057243238400/store/1260699263755751456) that unlocks additional features like responding to bot/webhook messages and priority support.
+  </Accordion>
+
+  <Accordion title="Which platforms does the bot support?">
+    FixTweetBot supports a wide range of platforms including:
+    - Twitter/X and Nitter
+    - Instagram, TikTok, Reddit, Threads
+    - Bluesky, Snapchat, Facebook, Pinterest
+    - Pixiv, Twitch, Spotify, DeviantArt, Newgrounds
+    - Mastodon, Tumblr, BiliBili, IFunny
+    - YouTube, Imgur, Weibo, Fur Affinity
+    - Various imageboards (Rule34, Danbooru, Gelbooru, e621, e926, etc.)
+    - Custom websites you configure
+    
+    See the [supported platforms](/features/supported-platforms) page for the complete list.
+  </Accordion>
+</AccordionGroup>
+
+## Usage Questions
+
+<AccordionGroup>
+  <Accordion title="How do I add the bot to my server?">
+    You can invite the bot using the [invite link](https://discord.com/oauth2/authorize?client_id=1164651057243238400) or find it on the [Discord App Directory](https://discord.com/application-directory/1164651057243238400).
+    
+    Make sure to grant the bot the necessary permissions (Send Messages, Embed Links, Manage Messages, etc.).
+  </Accordion>
+
+  <Accordion title="How do I prevent the bot from fixing a specific link?">
+    Add `fxignore` anywhere in your message. The bot will skip that message and leave the original embed intact.
+    
+    Example:
+    ```
+    Check out this tweet! https://twitter.com/user/status/123 fxignore
+    ```
+  </Accordion>
+
+  <Accordion title="Can I disable the bot in specific channels?">
+    Yes! Use the `/settings` command to configure where the bot operates. You can disable it by:
+    - Channel
+    - Role
+    - Member
+    - Keyword
+    - Website
+    
+    See the [filtering guide](/usage/filtering) for more details.
+  </Accordion>
+
+  <Accordion title="What happens to my original message?">
+    By default, the bot removes the embed from your original message but keeps the message itself. You can configure this behavior in settings to:
+    - Do nothing (keep the original embed)
+    - Remove the embed only
+    - Delete the entire message
+  </Accordion>
+
+  <Accordion title="Can the bot respond to other bots?">
+    Responding to bot and webhook messages is a premium feature. With the [premium subscription](https://discord.com/application-directory/1164651057243238400/store/1260699263755751456), the bot can fix links posted by other bots and webhooks.
+  </Accordion>
+
+  <Accordion title="Does the bot respect spoilers and markdown formatting?">
+    Yes! The bot preserves markdown formatting from your original message, including spoiler tags, bold text, italics, and other Discord markdown.
+  </Accordion>
+</AccordionGroup>
+
+## Privacy and Security
+
+<AccordionGroup>
+  <Accordion title="Does the bot collect my data?">
+    FixTweetBot respects your privacy. The bot only stores necessary configuration data like your server settings and preferences. No message content is stored permanently.
+    
+    For full details, see the [privacy policy](https://github.com/Kyrela/FixTweetBot/blob/main/privacy-policy.md).
+  </Accordion>
+
+  <Accordion title="Is the bot open source?">
+    FixTweetBot is source-available. You can view and contribute to the code on [GitHub](https://github.com/Kyrela/FixTweetBot). Contributors must sign a CLA (Contributor License Agreement) before their contributions can be merged.
+  </Accordion>
+
+  <Accordion title="Can I self-host the bot?">
+    Yes! FixTweetBot can be self-hosted using Docker or bare metal installation. See the [self-hosting guides](/self-hosting/docker) for detailed instructions.
+  </Accordion>
+</AccordionGroup>
+
+## Permissions and Setup
+
+<AccordionGroup>
+  <Accordion title="What permissions does the bot need?">
+    The bot requires the following permissions to function properly:
+    - **View Channels** - To see messages
+    - **Send Messages** - To post fixed links
+    - **Send Messages in Threads** - To work in threads
+    - **Embed Links** - To create embeds
+    - **Read Message History** - To process messages
+    - **Manage Messages** - To remove original embeds
+    
+    The bot also needs the `applications.commands` and `bot` scopes.
+  </Accordion>
+
+  <Accordion title="Why isn't the bot working in my server?">
+    Common issues include:
+    - Missing permissions (check the bot's role permissions)
+    - Channel-specific permission restrictions
+    - The bot is disabled for that channel/role
+    - You're using `fxignore` in your message
+    
+    See the [troubleshooting guide](/troubleshooting) for more help.
+  </Accordion>
+
+  <Accordion title="How do I configure the bot's settings?">
+    Use the `/settings` command to access the bot's configuration panel. This provides a modern interface for managing:
+    - Which websites to fix
+    - Filters (channels, roles, members, keywords)
+    - Embed appearance and behavior
+    - Language preferences
+    
+    See the [settings guide](/usage/settings) for detailed instructions.
+  </Accordion>
+</AccordionGroup>
+
+## Translation and Localization
+
+<AccordionGroup>
+  <Accordion title="What languages does the bot support?">
+    Currently supported languages:
+    - English (en)
+    - French (fr)
+    - Polish (pl)
+    - Russian (ru)
+    - Spanish - Spain (es-ES)
+    - Vietnamese (vi)
+    - Chinese - Simplified (zh-CN)
+    - Chinese - Traditional (zh-TW)
+    - Portuguese - Brazil (pt-BR)
+    - Japanese (ja)
+  </Accordion>
+
+  <Accordion title="Can I help translate the bot?">
+    Absolutely! You can contribute translations on [Crowdin](https://crowdin.com/project/fixtweetbot). See the [contributing guide](/contributing#translations) for more information.
+  </Accordion>
+
+  <Accordion title="Can the bot translate posts?">
+    Yes! FixTweetBot includes post translation capabilities for supported platforms. This feature can be configured in the bot's settings.
+  </Accordion>
+</AccordionGroup>
+
+## Premium and Support
+
+<AccordionGroup>
+  <Accordion title="What features does premium unlock?">
+    Premium subscribers get:
+    - Respond to bot and webhook messages
+    - Priority support
+    - Access to beta features
+    - Support for continued development
+    
+    Learn more on the [premium features](/features/premium) page.
+  </Accordion>
+
+  <Accordion title="How can I get support?">
+    For help with the bot:
+    - Join the [support server](https://discord.gg/3ej9JrkF3U)
+    - Check the [troubleshooting guide](/troubleshooting)
+    - Open an issue on [GitHub](https://github.com/Kyrela/FixTweetBot/issues)
+    - Use the `/about` command for quick help
+  </Accordion>
+
+  <Accordion title="How can I support the bot's development?">
+    You can support development by:
+    - Purchasing the [premium subscription](https://discord.com/application-directory/1164651057243238400/store/1260699263755751456)
+    - [Donating via GitHub Sponsors](https://github.com/sponsors/Kyrela)
+    - Contributing code or translations
+    - Leaving reviews and upvotes
+    
+    See the [contributing guide](/contributing) for all the ways to help.
+  </Accordion>
+</AccordionGroup>
+
+## Still Have Questions?
+
+If your question isn't answered here:
+
+- Join the [support server](https://discord.gg/3ej9JrkF3U)
+- Check the [troubleshooting guide](/troubleshooting)
+- Open an issue on [GitHub](https://github.com/Kyrela/FixTweetBot/issues)

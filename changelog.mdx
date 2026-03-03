@@ -1,0 +1,228 @@
+---
+title: Changelog
+description: Version history and changes for FixTweetBot
+---
+
+Track the evolution of FixTweetBot through version releases, new features, bug fixes, and improvements.
+
+## Current Version
+
+<Info>
+  **Current Version: 3.3.6**
+  
+  You can always check your bot's version using the `/about` command.
+</Info>
+
+## Release History
+
+For detailed release notes, changelogs, and version history, visit the [GitHub Releases page](https://github.com/Kyrela/FixTweetBot/releases).
+
+<Card title="View All Releases" icon="github" href="https://github.com/Kyrela/FixTweetBot/releases">
+  See the complete version history, release notes, and download options on GitHub
+</Card>
+
+## What's Included in Releases
+
+Each release typically includes:
+
+### New Features
+
+Major additions and enhancements to the bot's functionality, such as:
+- New platform support
+- Additional embed view options
+- Enhanced filtering capabilities
+- Premium features
+- Translation improvements
+
+### Bug Fixes
+
+Resolutions to reported issues and bugs:
+- Link detection improvements
+- Embed generation fixes
+- Performance optimizations
+- Configuration issue resolutions
+
+### Updates
+
+Improvements to existing features:
+- Better error handling
+- UI/UX enhancements in settings
+- Updated dependencies
+- Security patches
+- Documentation updates
+
+### Breaking Changes
+
+Occasionally, releases may include breaking changes:
+- Configuration format updates
+- Database migration requirements
+- API changes for self-hosters
+- Deprecated feature removals
+
+<Warning>
+  Breaking changes are clearly marked in release notes. Always read the release notes before updating a self-hosted instance.
+</Warning>
+
+## Staying Updated
+
+### For Public Bot Users
+
+If you're using the public FixTweetBot instance:
+- Updates are applied automatically
+- No action required on your part
+- Changes take effect immediately
+- Check `/about` to see the current version
+
+### For Self-Hosters
+
+If you're self-hosting FixTweetBot:
+
+<Steps>
+  <Step title="Check for Updates">
+    Monitor the [GitHub Releases](https://github.com/Kyrela/FixTweetBot/releases) page or watch the repository
+  </Step>
+  <Step title="Review Release Notes">
+    Read the changelog for breaking changes and migration steps
+  </Step>
+  <Step title="Backup Your Data">
+    Always backup your database before updating
+  </Step>
+  <Step title="Update Your Instance">
+    Follow the update instructions for your deployment method:
+    
+    **Docker:**
+    ```bash
+    docker compose pull
+    docker compose up -d
+    ```
+    
+    **Bare Metal:**
+    ```bash
+    git pull
+    pip install -r requirements.txt
+    masonite-orm migrate -C database/config.py -d database/migrations
+    ```
+  </Step>
+  <Step title="Verify the Update">
+    Check logs for any errors and verify the bot is functioning correctly
+  </Step>
+</Steps>
+
+## Version Numbering
+
+FixTweetBot follows semantic versioning (SemVer):
+
+- **Major version** (X.0.0): Breaking changes, major rewrites
+- **Minor version** (3.X.0): New features, backwards-compatible
+- **Patch version** (3.3.X): Bug fixes, minor improvements
+
+## Recent Highlights
+
+While specific release notes are on GitHub, FixTweetBot has evolved significantly:
+
+### Platform Support
+
+- Expanded from Twitter-only to 30+ platforms
+- Added support for custom websites
+- Integration with multiple fixing services
+- Continuous addition of new platforms
+
+### Features
+
+- Modern settings interface with `/settings` command
+- Multiple embed view options
+- Advanced filtering system
+- Translation support for 10+ languages
+- Premium tier with exclusive features
+- Posts translation capabilities
+
+### Self-Hosting
+
+- Docker support with docker-compose
+- Multiple database backend support
+- Comprehensive configuration options
+- Environment variable support
+- Migration system for database updates
+
+### Quality of Life
+
+- Markdown preservation
+- Spoiler tag support
+- Silent message support
+- Troubleshoot system
+- Open links in app on click
+
+## Contributing to Development
+
+Want to influence future releases?
+
+<CardGroup cols={2}>
+  <Card title="Request Features" icon="lightbulb" href="https://github.com/Kyrela/FixTweetBot/issues">
+    Suggest new features or improvements on GitHub
+  </Card>
+  <Card title="Report Bugs" icon="bug" href="https://github.com/Kyrela/FixTweetBot/issues">
+    Help us identify and fix issues
+  </Card>
+  <Card title="Contribute Code" icon="code" href="/contributing#code-contributions">
+    Submit pull requests with fixes or features
+  </Card>
+  <Card title="Join Discussion" icon="comments" href="https://discord.gg/3ej9JrkF3U">
+    Share ideas in the support server
+  </Card>
+</CardGroup>
+
+## Notifications
+
+Stay informed about new releases:
+
+### GitHub
+
+- **Watch** the [repository](https://github.com/Kyrela/FixTweetBot) on GitHub
+- Enable notifications for releases only
+- Subscribe to the RSS feed
+
+### Discord
+
+- Join the [support server](https://discord.gg/3ej9JrkF3U)
+- Check the announcements channel
+- Get notified about major updates
+
+### Social Media
+
+Follow project updates and milestones:
+- GitHub activity
+- Community discussions
+- Feature previews
+
+## Migration Guides
+
+For major version updates, migration guides are provided in the release notes when needed. These typically cover:
+
+- Configuration file changes
+- Database migrations
+- Breaking API changes
+- Deprecated feature removals
+- New requirements or dependencies
+
+<Tip>
+  Always backup your configuration and database before performing major version updates.
+</Tip>
+
+## Historical Context
+
+FixTweetBot began as a simple Twitter embed fixer and has grown into a comprehensive multi-platform embed enhancement solution, serving thousands of Discord servers and continuously evolving based on community feedback.
+
+## Need Help with Updates?
+
+If you encounter issues during or after an update:
+
+- Check the [troubleshooting guide](/troubleshooting)
+- Review the specific release notes
+- Visit the [support server](https://discord.gg/3ej9JrkF3U)
+- Open an issue on [GitHub](https://github.com/Kyrela/FixTweetBot/issues)
+
+---
+
+<Card title="View Full Changelog" icon="list" href="https://github.com/Kyrela/FixTweetBot/releases">
+  Access complete version history and detailed release notes on GitHub
+</Card>

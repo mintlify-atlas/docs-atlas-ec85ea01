@@ -1,0 +1,355 @@
+---
+title: Installation
+description: Detailed guide for adding FixTweetBot to your Discord server with proper permissions and configuration
+---
+
+# Installation guide
+
+This guide covers everything you need to know about adding and configuring FixTweetBot in your Discord server.
+
+## Prerequisites
+
+Before installing FixTweetBot, ensure you have:
+
+- **Manage Server** permission in your Discord server
+- A Discord server where you want to use the bot
+- Understanding of Discord's permission system (helpful but not required)
+
+## Adding the bot
+
+### Method 1: Invite link (recommended)
+
+The fastest way to add FixTweetBot to your server:
+
+<Steps>
+  <Step title="Open the invite link">
+    Click the official invite link:
+    
+    [**Invite FixTweetBot**](https://discord.com/oauth2/authorize?client_id=1164651057243238400)
+    
+    <Info>
+    The bot ID is `1164651057243238400`. Always verify you're inviting the correct bot!
+    </Info>
+  </Step>
+  
+  <Step title="Select your server">
+    Choose the server from the dropdown menu where you want to add the bot.
+    
+    <Warning>
+    Only servers where you have **Manage Server** permission will appear in the list.
+    </Warning>
+  </Step>
+  
+  <Step title="Review permissions">
+    The bot will request the following permissions:
+    
+    **Required permissions:**
+    - **View Channels** - See messages in channels
+    - **Send Messages** - Post fixed links
+    - **Send Messages in Threads** - Work in thread channels
+    - **Embed Links** - Display rich embeds
+    - **Read Message History** - Detect when embeds load
+    - **Manage Messages** - Remove or suppress original embeds
+    
+    <Tip>
+    While **Manage Messages** is technically optional, the bot won't be able to clean up original embeds without it. It's highly recommended to grant this permission.
+    </Tip>
+  </Step>
+  
+  <Step title="Authorize">
+    Click **Authorize** and complete the CAPTCHA if prompted.
+    
+    The bot will immediately join your server!
+  </Step>
+</Steps>
+
+### Method 2: Discord App Directory
+
+You can also add the bot through Discord's official App Directory:
+
+1. Visit the [FixTweetBot App Directory page](https://discord.com/application-directory/1164651057243238400)
+2. Click **Add to Server**
+3. Follow the same authorization steps as above
+
+### Method 3: Bot listings
+
+FixTweetBot is listed on several bot directory websites:
+
+- [Top.gg](https://top.gg/bot/1164651057243238400)
+- [Discord Bot List](https://discord.ly/fixtweet)
+- [Void Bots](https://voidbots.net/bot/1164651057243238400)
+- [dsc.bot](https://dsc.bot/fixtweet.8596)
+- [Discord Extreme List](https://discordextremelist.xyz/bots/1164651057243238400)
+- [Discord Bots](https://discord.bots.gg/bots/1164651057243238400)
+
+<Note>
+If you find FixTweetBot helpful, please leave an upvote or review on these platforms to help others discover it!
+</Note>
+
+## Required scopes
+
+When inviting the bot, ensure these OAuth2 scopes are included:
+
+- `applications.commands` - Enables slash commands like `/settings` and `/about`
+- `bot` - Adds the bot to your server
+
+The official invite link includes both scopes automatically.
+
+## Permission details
+
+Here's what each permission is used for:
+
+### View Channels
+
+**Why it's needed:** The bot must be able to see channels to read messages and detect social media links.
+
+**What happens without it:** The bot won't work in channels where it can't view messages.
+
+### Send Messages
+
+**Why it's needed:** The bot posts fixed links as new messages.
+
+**What happens without it:** The bot can't post fixed embeds at all.
+
+### Send Messages in Threads
+
+**Why it's needed:** Allows the bot to work in thread channels, not just regular channels.
+
+**What happens without it:** The bot won't respond to links posted in threads.
+
+### Embed Links
+
+**Why it's needed:** The fixed links need to display as rich embeds with images and videos.
+
+**What happens without it:** Fixed links will appear as plain text URLs without embeds.
+
+### Read Message History
+
+**Why it's needed:** The bot needs to check if embeds have loaded after posting fixed links.
+
+**What happens without it:** The bot may not properly detect failed embeds or timing issues.
+
+### Manage Messages
+
+**Why it's needed:** Allows the bot to suppress or delete the original message's embed (based on your settings).
+
+**What happens without it:** Both the original embed and the fixed embed will appear, creating duplicate content.
+
+<Warning>
+**Manage Messages** is the most commonly missing permission. If the bot posts fixed links but doesn't remove the original embed, check this permission!
+</Warning>
+
+## Post-installation setup
+
+After adding the bot, configure it for your server's needs:
+
+### 1. Test the bot
+
+Post a test message with a social media link:
+
+```
+https://twitter.com/user/status/1234567890
+```
+
+The bot should respond with a fixed link within a few seconds.
+
+### 2. Configure settings
+
+Run the settings command:
+
+```
+/settings
+```
+
+This opens an interactive menu with the following configuration options:
+
+<AccordionGroup>
+  <Accordion title="Websites" icon="globe">
+    Enable or disable specific platforms:
+    - Twitter/X
+    - Instagram
+    - TikTok
+    - Reddit
+    - And 25+ more
+    
+    Each platform can be toggled individually.
+  </Accordion>
+  
+  <Accordion title="Embed views" icon="eye">
+    Choose how embeds display for supported platforms:
+    - **Normal** - Standard embed with post content
+    - **Direct media** - Direct link to images/videos
+    - **Gallery** - Display multiple images in gallery format
+    - **Text only** - Just the text content, no media
+    
+    Different platforms support different view types.
+  </Accordion>
+  
+  <Accordion title="Original message" icon="message">
+    Decide what happens to the original message:
+    - **Nothing** - Keep both the original and fixed embeds
+    - **Remove embed** - Suppress the original embed (default)
+    - **Delete message** - Delete the entire original message
+    
+    Requires **Manage Messages** permission.
+  </Accordion>
+  
+  <Accordion title="Filters" icon="filter">
+    Control where the bot responds:
+    - **Channels** - Allow/deny specific channels
+    - **Roles** - Allow/deny users with specific roles
+    - **Members** - Allow/deny specific users
+    - **Keywords** - Allow/deny messages containing keywords
+    
+    Each filter can work as an allow-list or deny-list.
+  </Accordion>
+  
+  <Accordion title="Advanced options" icon="sliders">
+    Additional settings:
+    - **Reply silently** - Send fixed links without notifications
+    - **Reply to message** - Reply to the original or send standalone
+    - **Translation** - Auto-translate posts (per platform)
+    - **Custom websites** - Add your own domains to fix
+  </Accordion>
+</AccordionGroup>
+
+<Tip>
+Changes in `/settings` take effect immediately. No restart or save command needed!
+</Tip>
+
+### 3. Set up channel permissions (optional)
+
+You can restrict the bot to specific channels using Discord's permission system:
+
+<Steps>
+  <Step title="Go to channel settings">
+    Right-click the channel and select **Edit Channel**.
+  </Step>
+  
+  <Step title="Open permissions tab">
+    Navigate to the **Permissions** section.
+  </Step>
+  
+  <Step title="Add FixTweetBot role">
+    Click **Add members or roles** and select the FixTweetBot role or bot user.
+  </Step>
+  
+  <Step title="Configure permissions">
+    Set permissions as needed:
+    - ✅ **Allow** - Bot works in this channel
+    - ❌ **Deny** - Bot is disabled in this channel
+    - ⚪ **Neutral** - Inherits from server/category permissions
+  </Step>
+</Steps>
+
+Alternatively, use the `/settings` > Filters > Channels option to manage channel access through the bot interface.
+
+## Verification
+
+Confirm the bot is set up correctly:
+
+✅ Bot appears in the member list  
+✅ Bot responds to social media links  
+✅ Original embeds are suppressed/deleted (if configured)  
+✅ `/settings` command works  
+✅ `/about` command works  
+
+## Updating permissions
+
+If you need to update the bot's permissions later:
+
+1. Go to **Server Settings** > **Roles**
+2. Find the **FixTweetBot** role (automatically created when bot joined)
+3. Edit permissions as needed
+
+Or re-invite the bot using the [invite link](https://discord.com/oauth2/authorize?client_id=1164651057243238400) - it will update permissions without duplicating the bot.
+
+## Uninstalling
+
+To remove FixTweetBot from your server:
+
+1. Go to **Server Settings** > **Integrations**
+2. Find **FixTweetBot** in the list
+3. Click **Remove Integration**
+4. Confirm the removal
+
+All bot configuration and data for your server will be removed.
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Bot appears offline or doesn't join">
+    The bot may be temporarily down for maintenance. Check:
+    - [Support server](https://discord.gg/3ej9JrkF3U) for announcements
+    - [GitHub issues](https://github.com/Kyrela/FixTweetBot/issues) for known problems
+    
+    Wait a few minutes and try again.
+  </Accordion>
+  
+  <Accordion title="Missing permissions error">
+    The bot needs all 6 permissions listed above. Re-invite the bot using the official invite link to grant missing permissions.
+  </Accordion>
+  
+  <Accordion title="Bot doesn't respond in certain channels">
+    Check:
+    1. Bot has View Channels permission in that channel
+    2. Channel isn't filtered in `/settings` > Filters
+    3. The message contains a supported link (not just text)
+  </Accordion>
+  
+  <Accordion title="Commands don't appear">
+    Discord may not have synced slash commands yet. Wait 5-10 minutes after inviting the bot. If commands still don't appear, try:
+    1. Restarting Discord
+    2. Kicking and re-inviting the bot
+    3. Checking the bot has `applications.commands` scope
+  </Accordion>
+</AccordionGroup>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card
+    title="Quickstart guide"
+    icon="rocket"
+    href="/quickstart"
+  >
+    Learn how to use the bot and send your first fixed link
+  </Card>
+  <Card
+    title="Features overview"
+    icon="list"
+    href="/features/supported-platforms"
+  >
+    Explore all 30+ supported platforms and capabilities
+  </Card>
+  <Card
+    title="Customization"
+    icon="palette"
+    href="/usage/settings"
+  >
+    Deep dive into filters, embed views, and advanced options
+  </Card>
+  <Card
+    title="Self-hosting"
+    icon="server"
+    href="/self-hosting/docker"
+  >
+    Run your own instance for complete control
+  </Card>
+</CardGroup>
+
+## Getting help
+
+If you encounter issues during installation:
+
+- Use `/about` to verify bot info and check premium status
+- Join the [support server](https://discord.gg/3ej9JrkF3U)
+- Open an issue on [GitHub](https://github.com/Kyrela/FixTweetBot/issues)
+
+<Card
+  title="Join the support server"
+  icon="discord"
+  href="https://discord.gg/3ej9JrkF3U"
+>
+  Get help from the community and developer
+</Card>

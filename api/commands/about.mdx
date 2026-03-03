@@ -1,0 +1,329 @@
+---
+title: '/about Command'
+description: 'Display information about FixTweetBot'
+---
+
+## Overview
+
+The `/about` command displays comprehensive information about FixTweetBot, including help resources, premium status, and useful links. This command provides users with quick access to support, documentation, and the ability to add the bot to other servers.
+
+## Command Details
+
+### Syntax
+
+```
+/about
+```
+
+### Permissions Required
+
+- **Guild Only** - This command can only be used in Discord servers, not in DMs
+- No additional permissions required
+
+### Optional Command
+
+This command can be disabled by setting `about_command: false` in the bot configuration (`cogs/commands.py:20-23`). When disabled, the command is removed from the bot's command list entirely.
+
+## Implementation
+
+The command is implemented in `cogs/commands.py:37-96` and generates an embed with multiple information fields and action buttons.
+
+```python
+@discore.app_commands.command(
+    name=tstr('about.command.name'),
+    description=tstr('about.command.description'))
+@discore.app_commands.guild_only()
+async def about(self, i: discore.Interaction):
+    entrypoint_context.set(f"command about {{interaction={i!r}}}")
+    await Event.buff_cr({'name': 'command_about'})
+    # ... (embed and view creation)
+```
+
+## Display Information
+
+The `/about` command displays an embed with the following sections:
+
+### 1. Title and Description
+
+**Title**: The bot's name (from translation key `about.name`)
+
+**Description**: General information about the bot (from translation key `about.description`)
+
+### 2. Help Information
+
+**Field**: `about.help.name`
+
+**Content**: Instructions on how to use the bot and where to get help (from `about.help.value`)
+
+Provides basic usage information and guidance for new users.
+
+### 3. Premium Status
+
+**Field**: `about.premium.name`
+
+**Content**: Shows whether the current server has Premium features enabled
+
+**Implementation** (`cogs/commands.py:54-56`):
+```python
+embed.add_field(
+    name=t('about.premium.name'),
+    value=t(f'about.premium.{str(bool(is_premium(i))).lower()}'),
+    inline=False)
+```
+
+**Premium Detection**: Uses the `is_premium(interaction)` utility function to check if the current server has Premium access.
+
+**Values**:
+- `about.premium.true` - Displayed when server has Premium
+- `about.premium.false` - Displayed when server does not have Premium
+
+### 4. Important Links
+
+**Field**: `about.links.name`
+
+**Content**: Formatted links to important resources (from `about.links.value`)
+
+**Implementation** (`cogs/commands.py:58-63`):
+```python
+embed.add_field(
+    name=t('about.links.name'),
+    value=t('about.links.value',
+            invite_link=discore.config.invite_link.format(id=self.bot.application_id),
+            support_link=discore.config.support_link,
+            repo_link=discore.config.repo_link),
+    inline=False)
+```
+
+**Dynamic Values**:
+- `invite_link` - Generated invite URL with bot's application ID
+- `support_link` - Support server invite from configuration
+- `repo_link` - Source code repository from configuration
+
+### 5. Footer
+
+**Implementation**: Uses `discore.set_embed_footer(self.bot, embed)` (`cogs/commands.py:47`)
+
+Adds standard bot footer information (typically bot version, instance info, etc.)
+
+## Interactive Buttons
+
+The command includes up to 4 interactive buttons:
+
+### 1. Premium Button (Conditional)
+
+**Display Condition**: Only shown if:
+- Server does NOT have Premium (`not is_premium(i)`)
+- Bot has SKU configured (`is_sku()`)
+
+**Type**: Discord Premium (monetization) button
+
+**Implementation** (`cogs/commands.py:65-69`):
+```python
+if not is_premium(i) and is_sku():
+    view.add_item(discore.ui.Button(
+        style=discore.ButtonStyle.premium,
+        sku_id=discore.config.sku
+    ))
+```
+
+**Function**: Opens Discord's native monetization flow for purchasing bot Premium features
+
+### 2. Source Code Button
+
+**Label**: `about.source` (from translation)
+
+**Emoji**: GitHub emoji from configuration (`discore.config.emoji.github`)
+
+**URL**: Repository link (`discore.config.repo_link`)
+
+**Implementation** (`cogs/commands.py:70-75`):
+```python
+view.add_item(discore.ui.Button(
+    style=discore.ButtonStyle.link,
+    label=t('about.source'),
+    url=discore.config.repo_link,
+    emoji=discore.PartialEmoji.from_str(discore.config.emoji.github)
+))
+```
+
+**Function**: Opens the bot's source code repository in a browser
+
+### 3. Invite Button
+
+**Label**: `about.invite` (from translation)
+
+**Emoji**: Add emoji from configuration (`discore.config.emoji.add`)
+
+**URL**: Dynamic invite link with bot's application ID
+
+**Implementation** (`cogs/commands.py:76-81`):
+```python
+view.add_item(discore.ui.Button(
+    style=discore.ButtonStyle.link,
+    label=t('about.invite'),
+    url=discore.config.invite_link.format(id=self.bot.application_id),
+    emoji=discore.PartialEmoji.from_str(discore.config.emoji.add)
+))
+```
+
+**Function**: Opens the bot invite link, allowing users to add the bot to other servers
+
+### 4. Support Server Button
+
+**Label**: `about.support` (from translation)
+
+**Emoji**: Discord emoji from configuration (`discore.config.emoji.discord`)
+
+**URL**: Support server invite (`discore.config.support_link`)
+
+**Implementation** (`cogs/commands.py:82-87`):
+```python
+view.add_item(discore.ui.Button(
+    style=discore.ButtonStyle.link,
+    label=t('about.support'),
+    url=discore.config.support_link,
+    emoji=discore.PartialEmoji.from_str(discore.config.emoji.discord)
+))
+```
+
+**Function**: Opens the bot's support Discord server invite
+
+## Error Handling
+
+The command includes special error handling for Discord API issues:
+
+**Implementation** (`cogs/commands.py:89-96`):
+```python
+try:
+    await i.response.send_message(embed=embed, view=view)
+except discore.NotFound:
+    pass
+```
+
+**Reason**: Discord API sometimes incorrectly returns a 404 "Unknown interaction" error even when the interaction is valid and the message was successfully sent. The try-except block silently catches this error to prevent false error reports.
+
+**Implications**:
+- If the interaction is truly invalid, the error is silently ignored (acceptable since there's no way to respond to an invalid interaction anyway)
+- If the error is a false positive, the message is already sent and the error is correctly ignored
+
+## Configuration Dependencies
+
+The `/about` command relies on several configuration values:
+
+### Required Configuration Keys
+
+**From `discore.config`**:
+- `invite_link` - Template string for bot invite URL (uses `{id}` placeholder)
+- `support_link` - Invite URL for support server
+- `repo_link` - URL to source code repository
+- `sku` - Discord SKU ID for Premium purchases (optional)
+- `emoji.github` - Emoji for source code button
+- `emoji.add` - Emoji for invite button
+- `emoji.discord` - Emoji for support button
+
+### Translation Keys
+
+**Required translation strings**:
+- `about.command.name` - Command name in slash command menu
+- `about.command.description` - Command description in slash command menu
+- `about.name` - Embed title
+- `about.description` - Embed description
+- `about.help.name` - Help section field name
+- `about.help.value` - Help section content
+- `about.premium.name` - Premium section field name
+- `about.premium.true` - Premium status when enabled
+- `about.premium.false` - Premium status when disabled
+- `about.links.name` - Links section field name
+- `about.links.value` - Links section content (supports `{invite_link}`, `{support_link}`, `{repo_link}` placeholders)
+- `about.source` - Source code button label
+- `about.invite` - Invite button label
+- `about.support` - Support button label
+
+## Event Tracking
+
+The command logs usage analytics:
+
+**Implementation** (`cogs/commands.py:42-43`):
+```python
+entrypoint_context.set(f"command about {{interaction={i!r}}}")
+await Event.buff_cr({'name': 'command_about'})
+```
+
+**Purpose**: Tracks how often the `/about` command is used for analytics and monitoring.
+
+## Technical Details
+
+### Command Registration
+
+The command uses Discord's application command system with the following decorators:
+
+- `@discore.app_commands.command()` - Registers as a slash command
+- `@discore.app_commands.guild_only()` - Restricts to server use only
+
+### Dynamic Content
+
+All text content is loaded from translation files using the `t()` function, allowing for:
+- Multi-language support
+- Easy content updates without code changes
+- Centralized content management
+
+### Premium Integration
+
+The command integrates with the bot's premium system:
+
+**Premium Check Function**: `is_premium(interaction)` - Returns boolean indicating Premium status
+
+**SKU Check Function**: `is_sku()` - Returns boolean indicating if monetization is configured
+
+**Premium Button**: Only displayed when both conditions are met:
+1. Server doesn't have Premium
+2. Bot has SKU configured
+
+## Usage Examples
+
+### Basic Usage
+
+A user types `/about` in any channel:
+
+1. Bot responds with an embed containing:
+   - Bot name and description
+   - Help information
+   - Premium status (Yes/No)
+   - Important links
+
+2. Buttons are displayed below:
+   - **[Premium]** (if not Premium and SKU configured)
+   - **[Source Code]** - Links to GitHub
+   - **[Invite Bot]** - Adds bot to other servers
+   - **[Support]** - Joins support server
+
+### Server Variations
+
+**Non-Premium Server**:
+- Shows Premium status as disabled
+- Displays Premium purchase button
+- Includes all 4 buttons
+
+**Premium Server**:
+- Shows Premium status as enabled
+- No Premium purchase button
+- Includes 3 buttons (source, invite, support)
+
+**No SKU Configured**:
+- Shows Premium status (if applicable)
+- No Premium purchase button regardless of status
+- Includes 3 buttons (source, invite, support)
+
+## Related Implementation Files
+
+- **Command Definition**: `cogs/commands.py:37-96`
+- **Command Registration**: `cogs/commands.py:15-24`
+- **Premium Utilities**: `src/utils.py` (contains `is_premium()`, `is_sku()` functions)
+- **Configuration**: Bot configuration file (contains links and SKU)
+- **Translations**: Translation files (contains all `about.*` keys)
+
+## See Also
+
+- [/settings Command](./settings) - Configure bot settings
+- [Premium Features](/features/premium) - Learn about Premium features
+- [Configuration Guide](/self-hosting/configuration) - Configuration options for self-hosting

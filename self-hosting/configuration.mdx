@@ -1,0 +1,351 @@
+---
+title: Configuration Options
+description: Complete reference for FixTweetBot configuration file options
+---
+
+FixTweetBot uses a YAML configuration file system. The default settings are in `config.yml`, and you can override any setting by creating an `override.config.yml` file.
+
+## Configuration File Structure
+
+The bot reads configuration in the following order:
+
+1. `config.yml` - Default configuration
+2. `override.config.yml` - Your custom overrides (not tracked in git)
+3. Environment variables (Docker only) - Highest priority
+
+<Note>
+  You only need to include the settings you want to override in `override.config.yml`. All other values will use the defaults from `config.yml`.
+</Note>
+
+## Basic Configuration
+
+### Bot Settings
+
+```yaml override.config.yml
+# Your Discord bot token (required)
+token: YOUR_DISCORD_BOT_TOKEN
+
+# Optional: Server ID for development/admin commands
+dev_guild: YOUR_SERVER_ID
+
+# Bot description
+description: "This bot automatically repost x.com and twitter.com posts as fxtwitter ones."
+
+# Bot version (auto-updated by releases)
+version: "3.3.6"
+
+# Bot embed color (hex color as integer)
+color: 0x1d9bf0
+
+# Enable/disable hot reload (useful for development)
+hot_reload: false
+
+# Enable/disable the /about command
+about_command: true
+
+# Enable/disable analytics
+analytic: true
+```
+
+### Database Configuration
+
+```yaml override.config.yml
+database:
+  # Database host
+  host: localhost
+  
+  # Database port
+  port: 3306  # 5432 for PostgreSQL, 1433 for MSSQL
+  
+  # Database name
+  database: fixtweetbot
+  
+  # Database username
+  user: fixtweetbot
+  
+  # Database password
+  password: your_secure_password
+  
+  # Database driver: mysql, postgres, mssql, or sqlite
+  driver: mysql
+  
+  # Connection pooling settings
+  connection_pooling_enabled: true
+  connection_pooling_min_size: 2
+  connection_pooling_max_size: 10
+```
+
+<Warning>
+  Never commit your `override.config.yml` file to version control! It contains sensitive credentials.
+</Warning>
+
+#### Database Driver Options
+
+| Driver | Database | Notes |
+|--------|----------|-------|
+| `mysql` | MySQL or MariaDB | Recommended, best performance |
+| `postgres` | PostgreSQL | Fully supported |
+| `mssql` | Microsoft SQL Server | Fully supported |
+| `sqlite` | SQLite | For testing only, not recommended for production |
+
+### SQLite Example
+
+For development or testing with SQLite:
+
+```yaml override.config.yml
+database:
+  driver: sqlite
+  database: fixtweetbot.db  # File path
+```
+
+## Logging Configuration
+
+Customize how the bot logs information:
+
+```yaml override.config.yml
+log:
+  # Log file path (relative to bot directory)
+  file: "log.txt"
+  
+  # Whether to alert users about errors in Discord
+  alert_user: false
+  
+  # Stream logs to stderr instead of file
+  stream_to_err: false
+  
+  # Date format for log entries
+  date_format: "%d/%m/%Y %H:%M:%S"
+  
+  # Log message format
+  format: "[{asctime}] {levelformat} {name:<20} {message}"
+```
+
+### Log Format Variables
+
+Available variables for the `format` option:
+
+- `{asctime}` - Timestamp
+- `{levelformat}` - Log level (INFO, WARNING, ERROR, etc.)
+- `{name}` - Logger name
+- `{message}` - Log message
+
+### Example: Production Logging
+
+```yaml override.config.yml
+log:
+  file: "/var/log/fixtweetbot/bot.log"
+  alert_user: true  # Notify users of errors
+  stream_to_err: false
+  date_format: "%Y-%m-%d %H:%M:%S"
+```
+
+### Example: Development Logging
+
+```yaml override.config.yml
+log:
+  stream_to_err: true  # Output to console
+  alert_user: true
+  date_format: "%H:%M:%S"
+```
+
+## Emoji Configuration
+
+Customize emojis used in bot messages:
+
+```yaml override.config.yml
+emoji:
+  github: "🖥️"
+  add: "➕"
+  discord: "💬"
+  twitter: "🐦"
+  instagram: "📸"
+  tiktok: "🎶"
+  reddit: "🤖"
+  threads: "🧵"
+  snapchat: "👻"
+  facebook: "📘"
+  pinterest: "📌"
+  bluesky: "🦋"
+  pixiv: "🖼️"
+  mastodon: "🐘"
+  tumblr: "📝"
+  deviantart: "🎨"
+  newgrounds: "🚚"
+  twitch: "🎮"
+  spotify: "🎵"
+  bilibili: "📺"
+  ifunny: "🙂"
+  furaffinity: "🐾"
+  youtube: "📺"
+  imgur: "🖼️"
+  weibo: "👁️"
+  imageboards: "🖼️"
+  reply: "↩️"
+  webhooks: "🔄"
+  x: "❎"
+  fixtweet: "🤖"
+  role: "🎭"
+```
+
+<Note>
+  You can override individual emojis without specifying all of them.
+</Note>
+
+## Link Configuration
+
+Customize links shown in bot messages:
+
+```yaml override.config.yml
+# Invite link template ({id} will be replaced with bot ID)
+invite_link: "https://discord.com/oauth2/authorize?client_id={id}"
+
+# Repository link
+repo_link: "https://github.com/Kyrela/FixTweetBot"
+
+# Support server link
+support_link: "https://discord.gg/3ej9JrkF3U"
+```
+
+## Complete Example
+
+Here's a complete `override.config.yml` example for a self-hosted instance:
+
+```yaml override.config.yml
+# Bot authentication
+token: YOUR_DISCORD_BOT_TOKEN
+dev_guild: YOUR_SERVER_ID
+
+# Bot customization
+description: "Self-hosted FixTweetBot for MyServer"
+analytic: false  # Disable analytics for privacy
+
+# Database configuration
+database:
+  host: localhost
+  port: 3306
+  database: fixtweetbot
+  user: fixtweetbot
+  password: super_secure_password_here
+  driver: mysql
+  connection_pooling_enabled: true
+  connection_pooling_min_size: 2
+  connection_pooling_max_size: 10
+
+# Logging configuration
+log:
+  file: "/var/log/fixtweetbot/bot.log"
+  alert_user: true
+  stream_to_err: false
+  date_format: "%Y-%m-%d %H:%M:%S"
+  format: "[{asctime}] {levelformat} {name} - {message}"
+
+# Custom branding
+emoji:
+  fixtweet: "✨"
+  discord: "🎮"
+
+# Custom links
+invite_link: "https://discord.com/oauth2/authorize?client_id={id}&permissions=412317273088&scope=bot"
+support_link: "https://discord.gg/your_server"
+repo_link: "https://github.com/YourName/FixTweetBot"
+```
+
+## Docker Environment Variables
+
+When using Docker, you can set these environment variables instead of using `override.config.yml`:
+
+| Environment Variable | Config Key | Example |
+|---------------------|------------|----------|
+| `DISCORD_TOKEN` | `token` | `YOUR_TOKEN` |
+| `DEV_GUILD` | `dev_guild` | `123456789` |
+| `DATABASE_HOST` | `database.host` | `db` |
+| `DATABASE_PORT` | `database.port` | `3306` |
+| `DATABASE_NAME` | `database.database` | `fixtweetbot` |
+| `DATABASE_USER` | `database.user` | `fixtweetbot` |
+| `DATABASE_PASSWORD` | `database.password` | `password` |
+| `DATABASE_DRIVER` | `database.driver` | `mysql` |
+
+See the [Docker deployment guide](/self-hosting/docker) for more information.
+
+## Advanced Configuration
+
+### Connection Pooling
+
+For high-traffic instances, adjust connection pooling:
+
+```yaml override.config.yml
+database:
+  connection_pooling_enabled: true
+  connection_pooling_min_size: 5
+  connection_pooling_max_size: 20
+```
+
+### Disabling Features
+
+```yaml override.config.yml
+# Disable the /about command
+about_command: false
+
+# Disable analytics
+analytic: false
+
+# Disable hot reload (recommended for production)
+hot_reload: false
+```
+
+## Configuration Validation
+
+The bot uses the `discore` framework for configuration management. When you start the bot, it will:
+
+1. Load `config.yml`
+2. Merge in `override.config.yml` if present
+3. Apply environment variables (Docker)
+4. Validate required fields
+5. Start the bot
+
+If there are configuration errors, the bot will fail to start and display an error message.
+
+## Configuration Tips
+
+<Warning>
+  **Security Best Practices:**
+  - Never commit `override.config.yml` to version control
+  - Use strong, unique passwords for database access
+  - Rotate your Discord token if it's ever exposed
+  - Limit database user permissions to only what's needed
+</Warning>
+
+<Note>
+  **Performance Tips:**
+  - Enable connection pooling for better database performance
+  - Use MariaDB or PostgreSQL for production deployments
+  - Disable hot_reload in production
+  - Use file logging instead of stream_to_err in production
+</Note>
+
+## Troubleshooting Configuration
+
+### Bot won't start
+
+1. Check that `token` is set and valid
+2. Verify database credentials are correct
+3. Ensure YAML syntax is valid (use a YAML validator)
+
+### Database connection issues
+
+1. Verify `database.host`, `database.port`, and `database.driver` are correct
+2. Test database connection manually
+3. Check firewall rules allow database connections
+
+### Configuration not applying
+
+1. Ensure `override.config.yml` is in the correct location (repository root)
+2. Check for YAML syntax errors
+3. Restart the bot after making changes
+4. For Docker, ensure volumes are mounted correctly
+
+## Next Steps
+
+- [Docker deployment](/self-hosting/docker) - Run with Docker
+- [Bare metal installation](/self-hosting/bare-metal) - Manual installation
+- [Database setup](/self-hosting/database) - Database configuration details

@@ -1,0 +1,427 @@
+---
+title: Bare Metal Installation
+description: Install and run FixTweetBot directly on your server
+---
+
+This guide covers installing FixTweetBot directly on your system without Docker. This method gives you more control but requires manual setup of dependencies.
+
+## Prerequisites
+
+Before you begin, ensure you have:
+
+- Python 3.10 or higher
+- Git
+- A supported database server (MariaDB recommended, also supports MySQL, PostgreSQL, Microsoft SQL Server, or SQLite)
+- A Discord bot token (see [Setup](/setup/bot-creation))
+
+## Supported Databases
+
+FixTweetBot supports multiple database systems:
+
+- **MariaDB** (recommended)
+- MySQL
+- PostgreSQL
+- Microsoft SQL Server
+- SQLite (for testing only)
+
+## Installation
+
+<Steps>
+  <Step title="Install Python">
+    Ensure you have Python 3.10 or higher installed:
+
+    <CodeGroup>
+    ```bash Ubuntu/Debian
+    sudo apt update
+    sudo apt install python3 python3-pip python3-venv git
+    ```
+
+    ```bash Fedora/RHEL
+    sudo dnf install python3 python3-pip git
+    ```
+
+    ```bash macOS
+    brew install python@3.10 git
+    ```
+    </CodeGroup>
+
+    Verify the installation:
+    ```bash
+    python3 --version
+    ```
+  </Step>
+
+  <Step title="Clone the repository">
+    Clone the FixTweetBot repository:
+
+    ```bash
+    git clone https://github.com/Kyrela/FixTweetBot.git
+    cd FixTweetBot
+    ```
+  </Step>
+
+  <Step title="Install Python dependencies">
+    Install the required Python packages:
+
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+    <Note>
+      The bot uses the following key dependencies:
+      - `discore` - Discord bot framework
+      - `python-i18n` - Internationalization
+      - `masonite-orm` - Database ORM
+      - `pymysql` - MySQL/MariaDB driver
+      - `aiohttp` - Async HTTP client
+      - `psutil` - System utilities
+    </Note>
+
+    For PostgreSQL support, also install:
+    ```bash
+    pip install psycopg2-binary
+    ```
+
+    For Microsoft SQL Server support:
+    ```bash
+    pip install pymssql
+    ```
+  </Step>
+
+  <Step title="Set up the database">
+    Create a database for the bot:
+
+    <CodeGroup>
+    ```sql MariaDB/MySQL
+    CREATE DATABASE fixtweetbot CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+    CREATE USER 'fixtweetbot'@'localhost' IDENTIFIED BY 'your_secure_password';
+    GRANT ALL PRIVILEGES ON fixtweetbot.* TO 'fixtweetbot'@'localhost';
+    FLUSH PRIVILEGES;
+    ```
+
+    ```sql PostgreSQL
+    CREATE DATABASE fixtweetbot;
+    CREATE USER fixtweetbot WITH PASSWORD 'your_secure_password';
+    GRANT ALL PRIVILEGES ON DATABASE fixtweetbot TO fixtweetbot;
+    ```
+
+    ```bash SQLite
+    # No setup needed - database file will be created automatically
+    ```
+    </CodeGroup>
+
+    See the [Database Setup guide](/self-hosting/database) for detailed instructions.
+  </Step>
+
+  <Step title="Create configuration file">
+    Create an `override.config.yml` file in the repository root:
+
+    ```yaml override.config.yml
+    token: YOUR_DISCORD_BOT_TOKEN
+    dev_guild: YOUR_DEV_GUILD_ID  # optional
+
+    database:
+      host: localhost
+      driver: mysql  # or postgres, mssql, sqlite
+      database: fixtweetbot
+      user: fixtweetbot
+      password: your_secure_password
+      port: 3306  # 5432 for PostgreSQL, 1433 for MSSQL
+    ```
+
+    <Warning>
+      Replace `YOUR_DISCORD_BOT_TOKEN` with your actual Discord bot token.
+      Never commit this file to version control!
+    </Warning>
+
+    For SQLite:
+    ```yaml override.config.yml
+    token: YOUR_DISCORD_BOT_TOKEN
+
+    database:
+      driver: sqlite
+      database: fixtweetbot.db
+    ```
+  </Step>
+
+  <Step title="Run database migrations">
+    Initialize the database schema:
+
+    ```bash
+    masonite-orm migrate -C database/config.py -d database/migrations
+    ```
+
+    This will create all necessary tables and apply any pending migrations.
+
+    <Note>
+      The bot automatically runs migrations on startup when using Docker, but you must run them manually for bare metal installations.
+    </Note>
+  </Step>
+
+  <Step title="Start the bot">
+    Run the bot:
+
+    ```bash
+    python main.py
+    ```
+
+    You should see the bot connecting to Discord and becoming ready.
+  </Step>
+</Steps>
+
+## Configuration
+
+You can override any setting from `config.yml` in your `override.config.yml` file. See the [Configuration reference](/self-hosting/configuration) for all available options.
+
+### Common Configuration Options
+
+```yaml override.config.yml
+# Bot token (required)
+token: YOUR_DISCORD_BOT_TOKEN
+
+# Dev guild for admin commands (optional)
+dev_guild: YOUR_SERVER_ID
+
+# Database configuration (required)
+database:
+  host: localhost
+  driver: mysql
+  database: fixtweetbot
+  user: fixtweetbot
+  password: your_password
+  port: 3306
+
+# Custom bot description (optional)
+description: "My custom FixTweetBot instance"
+
+# Disable analytics (optional)
+analytic: false
+
+# Custom logging (optional)
+log:
+  file: "bot.log"
+  alert_user: false
+  stream_to_err: true
+```
+
+## Running as a Service
+
+For production deployments, you should run the bot as a system service.
+
+### Using systemd (Linux)
+
+<Steps>
+  <Step title="Create a service file">
+    Create `/etc/systemd/system/fixtweetbot.service`:
+
+    ```ini /etc/systemd/system/fixtweetbot.service
+    [Unit]
+    Description=FixTweetBot Discord Bot
+    After=network.target
+
+    [Service]
+    Type=simple
+    User=fixtweetbot
+    WorkingDirectory=/home/fixtweetbot/FixTweetBot
+    ExecStart=/usr/bin/python3 /home/fixtweetbot/FixTweetBot/main.py
+    Restart=always
+    RestartSec=10
+
+    [Install]
+    WantedBy=multi-user.target
+    ```
+
+    Adjust paths according to your installation location.
+  </Step>
+
+  <Step title="Create a dedicated user">
+    ```bash
+    sudo useradd -r -s /bin/false fixtweetbot
+    sudo chown -R fixtweetbot:fixtweetbot /path/to/FixTweetBot
+    ```
+  </Step>
+
+  <Step title="Enable and start the service">
+    ```bash
+    sudo systemctl daemon-reload
+    sudo systemctl enable fixtweetbot
+    sudo systemctl start fixtweetbot
+    ```
+  </Step>
+
+  <Step title="Check service status">
+    ```bash
+    sudo systemctl status fixtweetbot
+    ```
+
+    View logs:
+    ```bash
+    sudo journalctl -u fixtweetbot -f
+    ```
+  </Step>
+</Steps>
+
+### Using screen or tmux
+
+For quick deployments, you can use `screen` or `tmux`:
+
+<CodeGroup>
+```bash screen
+# Start a new screen session
+screen -S fixtweetbot
+
+# Run the bot
+cd /path/to/FixTweetBot
+python main.py
+
+# Detach: Press Ctrl+A, then D
+
+# Reattach later
+screen -r fixtweetbot
+```
+
+```bash tmux
+# Start a new tmux session
+tmux new -s fixtweetbot
+
+# Run the bot
+cd /path/to/FixTweetBot
+python main.py
+
+# Detach: Press Ctrl+B, then D
+
+# Reattach later
+tmux attach -t fixtweetbot
+```
+</CodeGroup>
+
+## Updating the Bot
+
+<Steps>
+  <Step title="Stop the bot">
+    ```bash
+    # If using systemd
+    sudo systemctl stop fixtweetbot
+
+    # If running manually, press Ctrl+C
+    ```
+  </Step>
+
+  <Step title="Pull latest changes">
+    ```bash
+    cd /path/to/FixTweetBot
+    git pull
+    ```
+  </Step>
+
+  <Step title="Update dependencies">
+    ```bash
+    pip install -r requirements.txt --upgrade
+    ```
+  </Step>
+
+  <Step title="Run migrations">
+    ```bash
+    masonite-orm migrate -C database/config.py -d database/migrations
+    ```
+  </Step>
+
+  <Step title="Restart the bot">
+    ```bash
+    # If using systemd
+    sudo systemctl start fixtweetbot
+
+    # If running manually
+    python main.py
+    ```
+  </Step>
+</Steps>
+
+## Troubleshooting
+
+### Import errors
+
+If you get import errors, ensure all dependencies are installed:
+```bash
+pip install -r requirements.txt --force-reinstall
+```
+
+### Database connection errors
+
+1. Verify your database is running:
+   <CodeGroup>
+   ```bash MariaDB/MySQL
+   sudo systemctl status mariadb
+   # or
+   sudo systemctl status mysql
+   ```
+
+   ```bash PostgreSQL
+   sudo systemctl status postgresql
+   ```
+   </CodeGroup>
+
+2. Test database connection:
+   <CodeGroup>
+   ```bash MariaDB/MySQL
+   mysql -u fixtweetbot -p -h localhost fixtweetbot
+   ```
+
+   ```bash PostgreSQL
+   psql -U fixtweetbot -h localhost fixtweetbot
+   ```
+   </CodeGroup>
+
+3. Check your `override.config.yml` credentials
+
+### Permission errors
+
+Ensure the bot user has read/write access to the bot directory:
+```bash
+sudo chown -R fixtweetbot:fixtweetbot /path/to/FixTweetBot
+sudo chmod -R 755 /path/to/FixTweetBot
+```
+
+### Python version issues
+
+Make sure you're using Python 3.10 or higher:
+```bash
+python3 --version
+```
+
+If you have multiple Python versions, you may need to use `python3.10` or `python3.11` explicitly.
+
+## Performance Optimization
+
+### Database Connection Pooling
+
+The bot uses connection pooling by default. You can adjust these settings in `override.config.yml`:
+
+```yaml
+database:
+  connection_pooling_enabled: true
+  connection_pooling_min_size: 2
+  connection_pooling_max_size: 10
+  # ... other database settings ...
+```
+
+### Using a Virtual Environment
+
+It's recommended to use a Python virtual environment:
+
+```bash
+python3 -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+Update your systemd service file to use the virtual environment:
+```ini
+ExecStart=/home/fixtweetbot/FixTweetBot/venv/bin/python /home/fixtweetbot/FixTweetBot/main.py
+```
+
+## Next Steps
+
+- [Configure your bot](/self-hosting/configuration) - Customize bot behavior
+- [Database management](/self-hosting/database) - Learn about database maintenance
+- [Bot permissions](/setup/permissions) - Set up required Discord permissions

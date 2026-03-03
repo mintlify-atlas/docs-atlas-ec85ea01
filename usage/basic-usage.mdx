@@ -1,0 +1,275 @@
+---
+title: Basic Usage
+description: Learn how to use FixTweetBot to fix social media embeds in Discord
+icon: play
+---
+
+## How It Works
+
+FixTweetBot automatically detects and fixes social media links in your Discord messages, replacing them with enhanced embeds that display better in Discord.
+
+<Steps>
+  <Step title="Send a message with a social media link">
+    Simply post a message containing a link from any [supported website](/features/supported-platforms).
+
+    ```
+    Check out this post: https://twitter.com/user/status/123456789
+    ```
+  </Step>
+
+  <Step title="Bot processes the link">
+    FixTweetBot detects the link and automatically:
+    - Checks if the link matches a supported website
+    - Applies your server's filtering rules
+    - Generates a fixed embed using the appropriate service
+  </Step>
+
+  <Step title="View the fixed embed">
+    The bot posts the fixed link with an enhanced embed. By default, it will:
+    - Reply to your original message (configurable)
+    - Remove embeds from your original message (configurable)
+    - Display videos, images, and galleries directly in Discord
+  </Step>
+</Steps>
+
+<Info>
+The bot preserves **markdown formatting** in your messages and respects spoiler tags and code blocks.
+</Info>
+
+## Ignoring Links with fxignore
+
+You can prevent the bot from fixing specific links by including the keyword `fxignore` anywhere in your message.
+
+<Tabs>
+  <Tab title="Normal Behavior">
+    ```
+    Look at this tweet: https://twitter.com/user/status/123456789
+    ```
+    
+    **Result:** Bot will fix the link and post an enhanced embed.
+  </Tab>
+
+  <Tab title="With fxignore">
+    ```
+    fxignore Look at this tweet: https://twitter.com/user/status/123456789
+    ```
+    
+    **Result:** Bot will skip this message entirely, keeping the original Twitter embed.
+  </Tab>
+
+  <Tab title="Multiple Links">
+    ```
+    fxignore Here are some tweets:
+    https://twitter.com/user/status/111
+    https://twitter.com/user/status/222
+    ```
+    
+    **Result:** All links in the message are ignored when `fxignore` is present.
+  </Tab>
+</Tabs>
+
+<Note>
+By default, `fxignore` is configured as a deny-list keyword. This means:
+- Messages **containing** `fxignore` will **not** be processed
+- Messages **without** `fxignore` will be processed normally
+
+You can customize this behavior in [keyword filtering](/usage/filtering#keyword-filtering).
+</Note>
+
+## What Links Are Detected
+
+The bot intelligently detects links while respecting Discord's formatting:
+
+### Links That Are Processed
+
+<Accordion title="Regular URLs">
+  ```
+  https://twitter.com/user/status/123456789
+  https://www.instagram.com/p/ABC123/
+  https://tiktok.com/@user/video/123
+  ```
+  
+  Standard URLs with or without `www.` are detected and fixed.
+</Accordion>
+
+<Accordion title="URLs in Markdown">
+  ```
+  Check out [this post](https://twitter.com/user/status/123)
+  ```
+  
+  Links within Discord markdown formatting are properly detected.
+</Accordion>
+
+<Accordion title="Multiple Links">
+  ```
+  Here are some posts:
+  https://twitter.com/user/status/111
+  https://instagram.com/p/ABC/
+  https://tiktok.com/@user/video/222
+  ```
+  
+  The bot can handle multiple links in a single message and will group them efficiently.
+</Accordion>
+
+### Links That Are Ignored
+
+<Accordion title="Suppressed Links">
+  ```
+  Don't fix this: <https://twitter.com/user/status/123>
+  ```
+  
+  Links wrapped in angle brackets `< >` are ignored by Discord and won't generate embeds.
+</Accordion>
+
+<Accordion title="Code Blocks">
+  ````
+  ```
+  https://twitter.com/user/status/123
+  ```
+  ````
+  
+  Links inside code blocks (both inline `` ` `` and multi-line `` ``` ``) are not processed.
+</Accordion>
+
+<Accordion title="Inline Code">
+  ```
+  Check this `https://twitter.com/user/status/123` example
+  ```
+  
+  Links within inline code formatting are ignored.
+</Accordion>
+
+<Accordion title="Spoiler Tags">
+  ```
+  Spoiler: ||https://twitter.com/user/status/123||
+  ```
+  
+  Links inside spoiler tags are detected differently and marked as spoilers in the fixed embed.
+</Accordion>
+
+## Message Content Options
+
+The bot's response includes:
+
+<CardGroup cols={2}>
+  <Card title="Fixed Links" icon="link">
+    Hyperlinked text showing the fixed URL (e.g., `[Twitter](<fixed-link>)`)
+  </Card>
+  
+  <Card title="Author Attribution" icon="user">
+    Link back to your original message (e.g., `[by @username](<message-link>)`)
+  </Card>
+  
+  <Card title="Original Link" icon="arrow-up-right-from-square">
+    Link to the original post for easy access
+  </Card>
+  
+  <Card title="Enhanced Embed" icon="image">
+    Rich embed with videos, images, and post content
+  </Card>
+</CardGroup>
+
+## Behavior Settings
+
+You can customize how the bot handles your original message:
+
+<Tabs>
+  <Tab title="Remove Embeds (Default)">
+    The bot removes the embed from your original message but keeps the message visible.
+    
+    **Requires:** `Manage Messages` permission
+  </Tab>
+  
+  <Tab title="Delete Message">
+    The bot completely deletes your original message, leaving only the fixed version.
+    
+    **Requires:** `Manage Messages` permission
+    
+    <Warning>
+    This option removes the original message entirely. Use with caution.
+    </Warning>
+  </Tab>
+  
+  <Tab title="Do Nothing">
+    The bot leaves your original message untouched, showing both the original and fixed embeds.
+    
+    **Requires:** No special permissions
+  </Tab>
+</Tabs>
+
+Configure this in [Settings → Original Message Behavior](/usage/settings#original-message-behavior).
+
+## Reply Method
+
+Choose how the bot posts its response:
+
+<CardGroup cols={2}>
+  <Card title="Reply to Message" icon="reply">
+    The bot replies to your original message, creating a threaded conversation.
+    
+    **Requires:** `Read Message History` permission
+  </Card>
+  
+  <Card title="Send in Channel" icon="message">
+    The bot sends a regular message in the channel without replying.
+    
+    **Requires:** Basic `Send Messages` permission
+  </Card>
+</CardGroup>
+
+### Silent Messages
+
+You can enable **silent messages** to prevent notifications when the bot posts. This is useful in busy channels.
+
+Configure these options in [Settings → Reply Method](/usage/settings#reply-method).
+
+## Common Scenarios
+
+<AccordionGroup>
+  <Accordion title="Bot doesn't respond to my links">
+    Check the following:
+    1. Verify the website is [supported](/features/supported-platforms)
+    2. Check if the channel is [filtered](/usage/filtering#channel-filtering)
+    3. Ensure your role/member isn't [filtered](/usage/filtering#role-and-member-filtering)
+    4. Confirm you didn't use the `fxignore` keyword
+    5. Use `/settings` → Troubleshooting to diagnose issues
+  </Accordion>
+  
+  <Accordion title="Bot posts but embed is missing">
+    This can happen when:
+    - The original post was deleted
+    - The content is private or restricted
+    - The embedding service is temporarily down
+    - The embed is too large (Discord has size limits)
+    
+    The bot will automatically delete messages without embeds after a short wait.
+  </Accordion>
+  
+  <Accordion title="I want to ignore specific channels">
+    Use the [channel filtering](/usage/filtering#channel-filtering) feature in `/settings`.
+  </Accordion>
+  
+  <Accordion title="Can the bot respond to other bots?">
+    Yes! Enable webhook support in [Settings → Webhooks](/usage/settings#webhooks-setting). This is a premium feature for non-webhook bots.
+  </Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Configure Settings" icon="sliders" href="/usage/settings">
+    Customize the bot's behavior for your server
+  </Card>
+  
+  <Card title="Set Up Filtering" icon="filter" href="/usage/filtering">
+    Control where and when the bot responds
+  </Card>
+  
+  <Card title="Add Custom Websites" icon="globe" href="/usage/custom-websites">
+    Support additional websites with custom fixers
+  </Card>
+  
+  <Card title="Supported Websites" icon="earth-americas" href="/features/supported-platforms">
+    View all supported social media platforms
+  </Card>
+</CardGroup>

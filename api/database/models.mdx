@@ -1,0 +1,528 @@
+---
+title: Database Models
+description: Reference documentation for FixTweetBot database models
+---
+
+FixTweetBot uses [Masonite ORM](https://orm.masoniteproject.com/) for database management. This page documents the core database models and their fields.
+
+## Guild
+
+Represents a Discord server (guild) and its bot configuration.
+
+**Location:** `database/models/Guild.py`
+
+**Table:** `guilds`
+
+### Fields
+
+<ParamField path="id" type="bigint" required>
+  Discord guild ID (unique identifier)
+</ParamField>
+
+<ParamField path="keywords" type="json" default='["fxignore"]'>
+  List of keywords to filter messages (e.g., "fxignore")
+</ParamField>
+
+<ParamField path="keywords_use_allow_list" type="boolean" default="false">
+  Whether to use allow list for keywords filtering
+</ParamField>
+
+<ParamField path="text_channels_use_allow_list" type="boolean" default="false">
+  Whether to use allow list for text channels
+</ParamField>
+
+<ParamField path="members_use_allow_list" type="boolean" default="false">
+  Whether to use allow list for members
+</ParamField>
+
+<ParamField path="roles_use_allow_list" type="boolean" default="false">
+  Whether to use allow list for roles
+</ParamField>
+
+<ParamField path="roles_use_any_rule" type="boolean" default="false">
+  Whether to apply any role rule matching
+</ParamField>
+
+<ParamField path="reply_to_message" type="boolean" default="false">
+  Whether to reply to the original message
+</ParamField>
+
+<ParamField path="reply_silently" type="boolean" default="false">
+  Whether replies should be silent (no notification)
+</ParamField>
+
+<ParamField path="webhooks" type="boolean" default="false">
+  Whether to respond to webhooks (premium feature)
+</ParamField>
+
+<ParamField path="original_message" type="enum" default="remove_embeds">
+  How to handle the original message:
+  - `nothing` - Leave the original message unchanged
+  - `remove_embeds` - Suppress embeds on the original message
+  - `delete` - Delete the original message
+</ParamField>
+
+<Expandable title="View Settings">
+  <ParamField path="twitter_view" type="enum" default="normal">
+    Twitter embed view mode:
+    - `normal` - Standard Twitter embed
+    - `gallery` - Gallery view for multiple images
+    - `text_only` - Text-only view
+    - `direct_media` - Direct media embed
+  </ParamField>
+
+  <ParamField path="instagram_view" type="enum" default="normal">
+    Instagram embed view mode:
+    - `normal` - Standard Instagram embed
+    - `direct_media` - Direct media embed
+    - `gallery` - Gallery view for multiple images
+  </ParamField>
+
+  <ParamField path="tiktok_view" type="enum" default="normal">
+    TikTok embed view mode:
+    - `normal` - Standard TikTok embed
+    - `gallery` - Gallery view
+    - `direct_media` - Direct media embed
+  </ParamField>
+
+  <ParamField path="bluesky_view" type="enum" default="normal">
+    Bluesky embed view mode:
+    - `normal` - Standard Bluesky embed
+    - `direct_media` - Direct media embed
+    - `gallery` - Gallery view
+  </ParamField>
+
+  <ParamField path="snapchat_view" type="enum" default="normal">
+    Snapchat embed view mode (via EmbedEZ):
+    - `normal` - Standard embed
+    - `direct_media` - Direct media embed
+  </ParamField>
+
+  <ParamField path="ifunny_view" type="enum" default="normal">
+    iFunny embed view mode (via EmbedEZ)
+  </ParamField>
+
+  <ParamField path="imgur_view" type="enum" default="normal">
+    Imgur embed view mode (via EmbedEZ)
+  </ParamField>
+
+  <ParamField path="weibo_view" type="enum" default="normal">
+    Weibo embed view mode (via EmbedEZ)
+  </ParamField>
+
+  <ParamField path="imageboards_view" type="enum" default="normal">
+    Imageboards embed view mode (via EmbedEZ)
+  </ParamField>
+
+  <ParamField path="pinterest_view" type="enum" default="normal">
+    Pinterest embed view mode (via EmbedEZ)
+  </ParamField>
+</Expandable>
+
+<ParamField path="created_at" type="timestamp">
+  Record creation timestamp
+</ParamField>
+
+<ParamField path="updated_at" type="timestamp">
+  Record last update timestamp
+</ParamField>
+
+### Relationships
+
+<ResponseField name="text_channels" type="HasMany">
+  Related TextChannel models (`database/models/TextChannel.py:84-86`)
+</ResponseField>
+
+<ResponseField name="members" type="HasMany">
+  Related Member models (`database/models/Guild.py:88-91`)
+</ResponseField>
+
+<ResponseField name="custom_websites" type="HasMany">
+  Related CustomWebsite models (`database/models/Guild.py:93-96`)
+</ResponseField>
+
+### Methods
+
+```python
+Guild.find_or_create(d_guild: discore.Guild, **kwargs)
+```
+
+Finds an existing guild by ID or creates a new one.
+
+---
+
+## TextChannel
+
+Represents a Discord text channel and its filtering settings.
+
+**Location:** `database/models/TextChannel.py`
+
+**Table:** `text_channels`
+
+**Extends:** `AFilterModel`
+
+### Fields
+
+<ParamField path="id" type="bigint" required>
+  Discord channel ID (unique identifier)
+</ParamField>
+
+<ParamField path="guild_id" type="bigint" required>
+  Reference to the parent guild ID
+</ParamField>
+
+<ParamField path="on_deny_list" type="boolean" default="false">
+  Whether the channel is on the deny list
+</ParamField>
+
+<ParamField path="on_allow_list" type="boolean" default="false">
+  Whether the channel is on the allow list
+</ParamField>
+
+<ParamField path="created_at" type="timestamp">
+  Record creation timestamp
+</ParamField>
+
+<ParamField path="updated_at" type="timestamp">
+  Record last update timestamp
+</ParamField>
+
+### Relationships
+
+<ResponseField name="guild" type="BelongsTo">
+  Parent Guild model
+</ResponseField>
+
+### Inherited Methods
+
+See [AFilterModel](#afiltermodel) for inherited methods.
+
+---
+
+## Member
+
+Represents a Discord guild member and their filtering settings.
+
+**Location:** `database/models/Member.py`
+
+**Table:** `members`
+
+**Extends:** `AFilterModel`
+
+### Fields
+
+<ParamField path="id" type="integer" required>
+  Auto-incrementing primary key
+</ParamField>
+
+<ParamField path="user_id" type="bigint" required>
+  Discord user ID (indexed)
+</ParamField>
+
+<ParamField path="guild_id" type="bigint" required>
+  Reference to the parent guild ID
+</ParamField>
+
+<ParamField path="bot" type="boolean">
+  Whether the member is a bot (bots are on deny list by default)
+</ParamField>
+
+<ParamField path="on_deny_list" type="boolean" default="false">
+  Whether the member is on the deny list
+</ParamField>
+
+<ParamField path="on_allow_list" type="boolean" default="false">
+  Whether the member is on the allow list
+</ParamField>
+
+<ParamField path="created_at" type="timestamp">
+  Record creation timestamp
+</ParamField>
+
+<ParamField path="updated_at" type="timestamp">
+  Record last update timestamp
+</ParamField>
+
+### Relationships
+
+<ResponseField name="guild" type="BelongsTo">
+  Parent Guild model
+</ResponseField>
+
+### Methods
+
+```python
+Member.find_or_create(d_member: discore.Member, guild: Guild | None = None, 
+                      guild_kwargs: dict | None = None, **kwargs) -> Member
+```
+
+Finds existing member by user_id and guild_id, or creates a new one. Bots are automatically added to deny list.
+
+```python
+Member.find_get_enabled(d_member: discore.Member, guild: Guild | None = None) -> bool
+```
+
+Checks if a member is enabled. Bots are disabled by default.
+
+```python
+Member.reset_lists(guild: Guild) -> None
+```
+
+Resets deny and allow lists for all members in a guild. Bots remain on deny list.
+
+---
+
+## Role
+
+Represents a Discord role and its filtering settings.
+
+**Location:** `database/models/Role.py`
+
+**Table:** `roles`
+
+**Extends:** `AFilterModel`
+
+### Fields
+
+<ParamField path="id" type="bigint" required>
+  Discord role ID (unique identifier)
+</ParamField>
+
+<ParamField path="guild_id" type="bigint" required>
+  Reference to the parent guild ID
+</ParamField>
+
+<ParamField path="on_deny_list" type="boolean" default="false">
+  Whether the role is on the deny list
+</ParamField>
+
+<ParamField path="on_allow_list" type="boolean" default="false">
+  Whether the role is on the allow list
+</ParamField>
+
+<ParamField path="created_at" type="timestamp">
+  Record creation timestamp
+</ParamField>
+
+<ParamField path="updated_at" type="timestamp">
+  Record last update timestamp
+</ParamField>
+
+### Relationships
+
+<ResponseField name="guild" type="BelongsTo">
+  Parent Guild model
+</ResponseField>
+
+### Methods
+
+```python
+Role.finds_get_enabled(d_roles: list[discore.Role], guild: Guild | None = None) -> List[bool]
+```
+
+Checks enabled status for multiple roles. Returns list of booleans (order/size not guaranteed to match input).
+
+---
+
+## CustomWebsite
+
+Represents a custom website configuration for a guild.
+
+**Location:** `database/models/CustomWebsite.py`
+
+**Table:** `custom_websites`
+
+### Fields
+
+<ParamField path="id" type="integer" required>
+  Auto-incrementing primary key
+</ParamField>
+
+<ParamField path="guild_id" type="bigint" required>
+  Reference to the parent guild ID
+</ParamField>
+
+<ParamField path="name" type="string" required>
+  Display name for the custom website
+</ParamField>
+
+<ParamField path="domain" type="string" required>
+  Original domain to match (e.g., "example.com")
+</ParamField>
+
+<ParamField path="fix_domain" type="string" required>
+  Fixed domain to use for embeds (e.g., "fxexample.com")
+</ParamField>
+
+<ParamField path="created_at" type="timestamp">
+  Record creation timestamp
+</ParamField>
+
+<ParamField path="updated_at" type="timestamp">
+  Record last update timestamp
+</ParamField>
+
+### Relationships
+
+<ResponseField name="guild" type="BelongsTo">
+  Parent Guild model
+</ResponseField>
+
+### Methods
+
+```python
+CustomWebsite.find_or_create(guild_id, website_id: int, 
+                             guild_kwargs: dict | None = None, **kwargs)
+```
+
+Finds existing custom website by ID or creates a new one.
+
+---
+
+## Event
+
+Represents analytics events for tracking bot usage.
+
+**Location:** `database/models/Event.py`
+
+**Table:** `events`
+
+### Fields
+
+<ParamField path="name" type="text" required>
+  Event name/type identifier
+</ParamField>
+
+<ParamField path="data" type="json" default="{}">
+  Additional event data in JSON format
+</ParamField>
+
+<ParamField path="created_at" type="timestamp">
+  Event timestamp
+</ParamField>
+
+<ParamField path="updated_at" type="timestamp">
+  Record last update timestamp
+</ParamField>
+
+### Methods
+
+```python
+Event.since(event_name: str | None = None, days: int = 0, 
+            hours: int = 0, minutes: int = 0, seconds: int = 0) -> list[Event]
+```
+
+Returns events since a specified time period, optionally filtered by event name.
+
+```python
+await Event.buff_cr(event: dict) -> None
+```
+
+Buffers event creation and flushes to database every 5 seconds for performance.
+
+<Note>
+  Event tracking is only active when `discore.config.analytic` is enabled.
+</Note>
+
+---
+
+## AFilterModel
+
+Abstract base model for filterable entities (TextChannel, Member, Role).
+
+**Location:** `database/models/AFilterModel.py`
+
+**Extends:** `DiscordRepresentation`
+
+### Common Fields
+
+<ParamField path="id" type="bigint" required>
+  Discord entity ID
+</ParamField>
+
+<ParamField path="guild_id" type="bigint" required>
+  Reference to parent guild
+</ParamField>
+
+<ParamField path="on_deny_list" type="boolean" default="false">
+  Whether entity is on the deny list
+</ParamField>
+
+<ParamField path="on_allow_list" type="boolean" default="false">
+  Whether entity is on the allow list
+</ParamField>
+
+### Inherited Methods
+
+<Expandable title="find_or_create()">
+  ```python
+  AFilterModel.find_or_create(d_element: GuildChild, guild: Guild | None = None,
+                              guild_kwargs: dict | None = None, **kwargs) -> Self
+  ```
+  
+  Finds or creates an entity in the database.
+  
+  **Parameters:**
+  - `d_element` - Discord element (Member, Role, TextChannel)
+  - `guild` - Parent guild (created if None)
+  - `guild_kwargs` - Arguments for guild creation
+  - `**kwargs` - Additional fields for entity creation
+</Expandable>
+
+<Expandable title="enabled()">
+  ```python
+  enabled(guild: Guild = None) -> bool
+  ```
+  
+  Checks if the entity is enabled based on allow/deny list configuration.
+  
+  **Logic:**
+  - If guild uses allow list: returns `on_allow_list` status
+  - If guild uses deny list: returns NOT `on_deny_list` status
+</Expandable>
+
+<Expandable title="find_get_enabled()">
+  ```python
+  AFilterModel.find_get_enabled(d_element: GuildChild, guild: Guild | None = None) -> bool
+  ```
+  
+  Finds entity and checks if enabled. Returns `True` if entity doesn't exist and guild uses deny list.
+</Expandable>
+
+<Expandable title="update_enabled()">
+  ```python
+  update_enabled(enabled: bool, guild: Guild = None) -> None
+  ```
+  
+  Sets entity's enabled status by updating appropriate list field.
+</Expandable>
+
+<Expandable title="reset_lists()">
+  ```python
+  AFilterModel.reset_lists(guild: Guild) -> None
+  ```
+  
+  Resets both deny and allow lists for all entities of this type in a guild.
+</Expandable>
+
+---
+
+## DiscordRepresentation
+
+Base model for Discord entities with common functionality.
+
+**Location:** `database/models/DiscordRepresentation.py`
+
+### Common Fields
+
+<ParamField path="id" type="bigint" required>
+  Discord entity ID (unique identifier)
+</ParamField>
+
+### Methods
+
+```python
+DiscordRepresentation.find_or_create(d_element: discore.Object, **kwargs) -> Self
+```
+
+Finds existing entity by Discord ID or creates a new one.

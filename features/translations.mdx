@@ -1,0 +1,239 @@
+---
+title: 'Multi-Language Support'
+description: 'FixTweetBot supports multiple languages for post translations and bot interface'
+icon: 'language'
+---
+
+FixTweetBot offers comprehensive multi-language support, allowing you to use the bot in your preferred language and even translate posts from social media.
+
+## Supported Languages
+
+FixTweetBot currently supports the following languages:
+
+<CardGroup cols={3}>
+  <Card title="English" icon="flag-usa">
+    `en` - English
+  </Card>
+  
+  <Card title="French" icon="flag">
+    `fr` - Français
+  </Card>
+  
+  <Card title="Polish" icon="flag">
+    `pl` - Polski
+  </Card>
+  
+  <Card title="Russian" icon="flag">
+    `ru` - Русский
+  </Card>
+  
+  <Card title="Spanish" icon="flag">
+    `es-ES` - Español (España)
+  </Card>
+  
+  <Card title="Vietnamese" icon="flag">
+    `vi` - Tiếng Việt
+  </Card>
+  
+  <Card title="Chinese (Simplified)" icon="flag">
+    `zh-CN` - 简体中文
+  </Card>
+  
+  <Card title="Chinese (Traditional)" icon="flag">
+    `zh-TW` - 繁體中文
+  </Card>
+  
+  <Card title="Portuguese (Brazil)" icon="flag">
+    `pt-BR` - Português (Brasil)
+  </Card>
+  
+  <Card title="Japanese" icon="flag">
+    `ja` - 日本語
+  </Card>
+</CardGroup>
+
+## Post Translation Feature
+
+Some platforms support automatic post translation to your server's configured language.
+
+### Platforms with Translation Support
+
+Translation is available for platforms where `is_translation = True` in the source code:
+
+<AccordionGroup>
+  <Accordion title="Twitter / X" icon="twitter">
+    **Translation:** ✓ Supported
+    
+    Twitter posts can be automatically translated to your server's language. The translation is provided by the FxTwitter service.
+    
+    **Implementation:** `src/websites.py:372`
+    ```python
+    is_translation = True
+    ```
+    
+    The language is appended to the URL path: `fxtwitter.com/{lang}/...`
+  </Accordion>
+  
+  <Accordion title="EmbedEZ Platforms" icon="globe">
+    **Translation:** ✓ Supported
+    
+    EmbedEZ-powered platforms support translation for:
+    - Snapchat
+    - IFunny
+    - Imgur
+    - Weibo
+    - Imageboards (Rule34.xxx, Gelbooru, Danbooru, e621, etc.)
+    - Pinterest
+    
+    **Implementation:** `src/websites.py:343`
+    ```python
+    is_translation = True
+    ```
+  </Accordion>
+  
+  <Accordion title="Other Platforms" icon="circle-xmark">
+    **Translation:** ✗ Not supported
+    
+    The following platforms do not currently support post translation:
+    - Instagram
+    - TikTok
+    - Reddit
+    - Threads
+    - Bluesky
+    - Facebook
+    - YouTube
+    - And others
+    
+    These platforms will display content in the original language.
+  </Accordion>
+</AccordionGroup>
+
+## How Translation Works
+
+### Implementation Details
+
+Translation support is implemented in the `GenericWebsiteLink` class:
+
+```python
+def route_fix_post_path_segments(self) -> str:
+    if not self.is_translation:
+        return ""
+    
+    return f"/{self.guild.lang}" if self.guild[f"{self.id}_tr"] else ""
+```
+
+This method:
+1. Checks if the platform supports translation (`is_translation`)
+2. Checks if translation is enabled for the platform in guild settings
+3. Appends the language code to the URL if both conditions are met
+
+### Example
+
+For a French server with Twitter translation enabled:
+- Original URL: `https://twitter.com/user/status/123`
+- Fixed URL: `https://fxtwitter.com/fr/user/status/123`
+- The post content will be translated to French
+
+## Configuring Language Settings
+
+### Server Language
+
+1. Use the `/settings` command in your Discord server
+2. Navigate to the language settings
+3. Select your preferred language from the supported options
+4. The bot will use this language for:
+   - Bot interface and messages
+   - Post translations (where supported)
+
+### Per-Platform Translation
+
+For platforms that support translation, you can enable or disable it individually:
+
+1. Use the `/settings` command
+2. Navigate to the specific platform settings
+3. Toggle the translation option
+4. The bot will respect this setting when fixing links from that platform
+
+<Note>
+Translation settings are server-specific. Each server can configure its own language preferences.
+</Note>
+
+## Contributing Translations
+
+<Card title="Help Translate FixTweetBot" icon="crowdin" href="https://crowdin.com/project/fixtweetbot">
+  FixTweetBot uses Crowdin for community translations. You can help translate the bot into your language or improve existing translations.
+  
+  **Join the translation project:** [crowdin.com/project/fixtweetbot](https://crowdin.com/project/fixtweetbot)
+</Card>
+
+### How to Contribute
+
+1. Visit the [Crowdin project page](https://crowdin.com/project/fixtweetbot)
+2. Sign up or log in to Crowdin
+3. Select your language or request a new language
+4. Start translating strings
+5. Submit your translations for review
+
+### Translation Guidelines
+
+<AccordionGroup>
+  <Accordion title="Accuracy" icon="check">
+    - Translate meaning, not just words
+    - Keep technical terms consistent
+    - Maintain the same tone as the original
+  </Accordion>
+  
+  <Accordion title="Context" icon="context">
+    - Consider how the text appears in Discord
+    - Respect character limits for embed fields
+    - Test translations in the actual bot when possible
+  </Accordion>
+  
+  <Accordion title="Variables" icon="code">
+    - Keep placeholders like `{variable}` unchanged
+    - Maintain formatting codes like `**bold**` or `*italic*`
+    - Don't translate technical identifiers
+  </Accordion>
+  
+  <Accordion title="Cultural Adaptation" icon="globe">
+    - Adapt idioms and expressions to your language
+    - Consider cultural differences in tone
+    - Make the bot feel natural for native speakers
+  </Accordion>
+</AccordionGroup>
+
+## Language Detection
+
+The bot automatically detects your server's language preference based on:
+
+1. **Manual Configuration:** Set through `/settings` command
+2. **Server Default:** Falls back to English if not configured
+3. **Platform Support:** Only applies translation for supported platforms
+
+## Translation Credits
+
+Translations are provided by the community through Crowdin. Special thanks to all translators who have contributed to making FixTweetBot accessible in multiple languages!
+
+<Card icon="heart" title="View All Translators" href="https://crowdin.com/project/fixtweetbot">
+  See the full list of contributors on the Crowdin project page.
+</Card>
+
+## Frequently Asked Questions
+
+<AccordionGroup>
+  <Accordion title="Why aren't all platforms translated?">
+    Translation depends on the fixer service supporting it. Not all fixer services provide translation capabilities. FixTweetBot can only translate posts on platforms where the underlying fixer service supports it.
+  </Accordion>
+  
+  <Accordion title="Can I request a new language?">
+    Yes! Visit the [Crowdin project](https://crowdin.com/project/fixtweetbot) and request your language. Once enough translations are completed, it will be added to the bot.
+  </Accordion>
+  
+  <Accordion title="How accurate are the translations?">
+    Translation quality depends on the fixer service. FxTwitter and EmbedEZ provide machine translations that are generally accurate but may not be perfect. Manual review is recommended for critical content.
+  </Accordion>
+  
+  <Accordion title="Does translation work for all post types?">
+    Translation typically works for text content in posts. Media captions and metadata may or may not be translated depending on the fixer service.
+  </Accordion>
+</AccordionGroup>
